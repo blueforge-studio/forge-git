@@ -1,0 +1,16 @@
+{
+  "name": "forge-git",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "pnpm --filter @forge-git/web dev",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "test": "turbo run test",
+    "build": "turbo run build"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  }
+}

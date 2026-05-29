@@ -1,0 +1,98 @@
+version: '3.9'
+
+services:
+  gitea:
+    image: gitea/gitea:1.21
+    container_name: forge-git-gitea
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+      - "2222:22"
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__database__DB_TYPE=sqlite3
+      - GITEA__database__PATH=/data/gitea/gitea.db
+      - GITEA__server__DOMAIN=git.localhost
+      - GITEA__server__ROOT_URL=http://git.localhost:3001
+      - GITEA__server__SSH_PORT=2222
+      - GITEA__mailer__ENABLED=false
+    volumes:
+      - gitea-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - redis
+
+  forge-git-api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: forge-git-api
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://forge-git:forge-git@postgres:5432/forge-git
+      - REDIS_URL=redis://redis:6379
+      - GITEA_URL=http://gitea:3000
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+    depends_on:
+      - postgres
+      - redis
+
+  deploy-runner:
+    build:
+      context: ./apps/deploy-runner
+      dockerfile: Dockerfile
+    container_name: forge-git-deploy-runner
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - MINIO_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - redis
+      - minio
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: forge-git-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=forge-git
+      - POSTGRES_PASSWORD=forge-git
+      - POSTGRES_DB=forge-git
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: forge-git-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
+  minio:
+    image: minio/minio:latest
+    container_name: forge-git-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_SECRET_KEY=${MINIO_SECRET_KEY}
+    volumes:
+      - minio-data:/data
+
+volumes:
+  gitea-data:
+  postgres-data:
+  redis-data:
+  minio-data:

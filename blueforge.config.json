@@ -1,0 +1,34 @@
+{
+  "name": "forge-git",
+  "displayName": "Forge Git",
+  "category": "devtools",
+  "tags": [
+    "git",
+    "version-control",
+    "devops"
+  ],
+  "apps": {
+    "cli": {
+      "path": "packages/cli",
+      "type": "node",
+      "role": "cli"
+    },
+    "deploy-runner": {
+      "path": "packages/deploy-runner",
+      "role": "misc"
+    },
+    "gitea-bridge": {
+      "path": "packages/gitea-bridge",
+      "role": "misc"
+    },
+    "ui": {
+      "path": "packages/ui",
+      "role": "library"
+    },
+    "web": {
+      "path": "apps/web",
+      "type": "next",
+      "role": "app"
+    }
+  }
+}
