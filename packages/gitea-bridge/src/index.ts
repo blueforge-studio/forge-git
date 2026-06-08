@@ -379,3 +379,203 @@ export interface ForgeGitPreview {
   status: 'pending' | 'building' | 'deployed' | 'failed' | 'archived'
   createdAt: Date
 }
+
+// ─── Pull Requests ────────────────────────────────────────────────────────────
+
+export interface PullRequest {
+  id: number
+  number: number
+  title: string
+  body?: string
+  state: 'open' | 'closed'
+  merged: boolean
+  mergeable: boolean
+  comments: number
+  html_url: string
+  diff_url: string
+  created_at: string
+  updated_at: string
+  closed_at?: string
+  merged_at?: string
+  merge_commit_sha?: string
+  head: { label: string; ref: string; sha: string; repo_id: number }
+  base: { label: string; ref: string; sha: string; repo_id: number }
+}
+
+export async function listPullRequests(
+  owner: string, repo: string,
+  opts?: { state?: 'open' | 'closed' | 'all' } & GiteaOpts
+): Promise<PullRequest[]> {
+  const qs = opts?.state && opts.state !== 'all' ? `?state=${opts.state}` : ''
+  return request<PullRequest[]>(`/repos/${owner}/${repo}/pulls${qs}`, opts)
+}
+
+export async function getPullRequest(
+  owner: string, repo: string, index: number, opts?: GiteaOpts
+): Promise<PullRequest> {
+  return request<PullRequest>(`/repos/${owner}/${repo}/pulls/${index}`, opts)
+}
+
+export async function createPullRequest(
+  owner: string, repo: string,
+  data: { title: string; head: string; base: string; body?: string },
+  opts?: GiteaOpts
+): Promise<PullRequest> {
+  return request<PullRequest>(`/repos/${owner}/${repo}/pulls`, {
+    init: { method: 'POST', body: JSON.stringify(data) },
+    ...opts,
+  })
+}
+
+export async function updatePullRequest(
+  owner: string, repo: string, index: number,
+  data: { title?: string; body?: string; state?: 'open' | 'closed' },
+  opts?: GiteaOpts
+): Promise<PullRequest> {
+  return request<PullRequest>(`/repos/${owner}/${repo}/pulls/${index}`, {
+    init: { method: 'PATCH', body: JSON.stringify(data) },
+    ...opts,
+  })
+}
+
+// ─── Issues ───────────────────────────────────────────────────────────────────
+
+export interface Issue {
+  id: number
+  number: number
+  title: string
+  body?: string
+  state: 'open' | 'closed'
+  comments: number
+  html_url: string
+  created_at: string
+  updated_at: string
+  closed_at?: string
+  labels: Array<{ id: number; name: string; color: string }>
+}
+
+export async function listIssues(
+  owner: string, repo: string,
+  opts?: { state?: 'open' | 'closed' | 'all' } & GiteaOpts
+): Promise<Issue[]> {
+  const qs = opts?.state && opts.state !== 'all' ? `?state=${opts.state}` : ''
+  return request<Issue[]>(`/repos/${owner}/${repo}/issues${qs}`, opts)
+}
+
+export async function getIssue(
+  owner: string, repo: string, index: number, opts?: GiteaOpts
+): Promise<Issue> {
+  return request<Issue>(`/repos/${owner}/${repo}/issues/${index}`, opts)
+}
+
+export async function createIssue(
+  owner: string, repo: string,
+  data: { title: string; body?: string; labels?: number[] },
+  opts?: GiteaOpts
+): Promise<Issue> {
+  return request<Issue>(`/repos/${owner}/${repo}/issues`, {
+    init: { method: 'POST', body: JSON.stringify(data) },
+    ...opts,
+  })
+}
+
+export async function updateIssue(
+  owner: string, repo: string, index: number,
+  data: { title?: string; body?: string; state?: 'open' | 'closed' },
+  opts?: GiteaOpts
+): Promise<Issue> {
+  return request<Issue>(`/repos/${owner}/${repo}/issues/${index}`, {
+    init: { method: 'PATCH', body: JSON.stringify(data) },
+    ...opts,
+  })
+}
+
+// ─── Releases ─────────────────────────────────────────────────────────────────
+
+export interface Release {
+  id: number
+  tag_name: string
+  name: string
+  body?: string
+  draft: boolean
+  prerelease: boolean
+  created_at: string
+  published_at?: string
+  html_url: string
+  zipball_url: string
+  tarball_url: string
+}
+
+export async function listReleases(
+  owner: string, repo: string, opts?: GiteaOpts
+): Promise<Release[]> {
+  return request<Release[]>(`/repos/${owner}/${repo}/releases`, opts)
+}
+
+export async function getRelease(
+  owner: string, repo: string, id: number, opts?: GiteaOpts
+): Promise<Release> {
+  return request<Release>(`/repos/${owner}/${repo}/releases/${id}`, opts)
+}
+
+export async function getLatestRelease(
+  owner: string, repo: string, opts?: GiteaOpts
+): Promise<Release> {
+  return request<Release>(`/repos/${owner}/${repo}/releases/latest`, opts)
+}
+
+export async function createRelease(
+  owner: string, repo: string,
+  data: { tag_name: string; name: string; body?: string; draft?: boolean; prerelease?: boolean },
+  opts?: GiteaOpts
+): Promise<Release> {
+  return request<Release>(`/repos/${owner}/${repo}/releases`, {
+    init: { method: 'POST', body: JSON.stringify(data) },
+    ...opts,
+  })
+}
+
+// ─── Branches ─────────────────────────────────────────────────────────────────
+
+export interface Branch {
+  name: string
+  commit: { id: string; message: string }
+  protected: boolean
+}
+
+export async function listBranches(
+  owner: string, repo: string, opts?: GiteaOpts
+): Promise<Branch[]> {
+  return request<Branch[]>(`/repos/${owner}/${repo}/branches`, opts)
+}
+
+export async function getBranch(
+  owner: string, repo: string, branch: string, opts?: GiteaOpts
+): Promise<Branch> {
+  return request<Branch>(`/repos/${owner}/${repo}/branches/${encodeURIComponent(branch)}`, opts)
+}
+
+// ─── Commits ──────────────────────────────────────────────────────────────────
+
+export interface Commit {
+  sha: string
+  commit: {
+    author: { name: string; email: string; date: string }
+    committer: { name: string; email: string; date: string }
+    message: string
+  }
+  html_url: string
+}
+
+export async function listCommits(
+  owner: string, repo: string, opts?: { ref?: string } & GiteaOpts
+): Promise<Commit[]> {
+  const qs = opts?.ref ? `?sha=${encodeURIComponent(opts.ref)}` : ''
+  return request<Commit[]>(`/repos/${owner}/${repo}/commits${qs}`, opts)
+}
+
+export async function getCommit(
+  owner: string, repo: string, ref: string, opts?: GiteaOpts
+): Promise<Commit> {
+  return request<Commit>(`/repos/${owner}/${repo}/commits/${encodeURIComponent(ref)}`, opts)
+}

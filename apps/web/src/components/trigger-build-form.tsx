@@ -1,15 +1,35 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import type { BuildJobData } from '@/lib/queue'
 
 interface Props {
   onTriggered?: () => void
+  prefill?: Partial<BuildJobData>
 }
 
-export default function TriggerBuildForm({ onTriggered }: Props) {
+export default function TriggerBuildForm({ onTriggered, prefill }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [jobId, setJobId] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    if (!prefill || !formRef.current) return
+    const form = formRef.current
+    if (prefill.repoId) {
+      const el = form.elements.namedItem('repoId') as HTMLInputElement | null
+      if (el) el.value = prefill.repoId
+    }
+    if (prefill.branch) {
+      const el = form.elements.namedItem('branch') as HTMLInputElement | null
+      if (el) el.value = prefill.branch
+    }
+    if (prefill.orgId) {
+      const el = form.elements.namedItem('orgId') as HTMLInputElement | null
+      if (el) el.value = prefill.orgId
+    }
+  }, [prefill])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -45,7 +65,7 @@ export default function TriggerBuildForm({ onTriggered }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 p-4">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-2 p-4">
       <div className="grid gap-2 sm:grid-cols-2">
         <input
           name="repoId"

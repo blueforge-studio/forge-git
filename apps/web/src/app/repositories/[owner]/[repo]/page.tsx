@@ -4,8 +4,9 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
   GitFork, Star, Eye, Clock,
-  AlertCircle, GitPullRequest, Play
+  AlertCircle, GitPullRequest, Play, CheckCircle2, XCircle, Loader2
 } from 'lucide-react'
+import { deploymentsQueue } from '@/lib/queue'
 import { CopyButton } from './copy-button'
 import RepoSettingsNav from '@/components/repo-settings-nav'
 import TriggerBuildForm from '@/components/trigger-build-form'
@@ -33,6 +34,29 @@ export default async function RepoDetailPage({ params }: Props) {
         </div>
       </main>
     )
+  }
+
+  // Fetch latest build status for this repo (graceful degradation)
+  let buildStatus: 'none' | 'passing' | 'failing' | 'running' = 'none'
+  let latestBuildId: string | undefined
+  try {
+    const repoId = `${owner}/${repoName}`
+    const [completed, failed, active] = await Promise.all([
+      deploymentsQueue.getJobs(['completed'], 0, 0),
+      deploymentsQueue.getJobs(['failed'], 0, 0),
+      deploymentsQueue.getJobs(['active'], 0, 0),
+    ])
+    const matchRepo = (j: { data: unknown }) => (j.data as { repoId?: string })?.repoId === repoId
+    if (active.some(matchRepo)) {
+      buildStatus = 'running'
+      latestBuildId = active.find(matchRepo)?.id
+    } else if (failed.some(matchRepo)) {
+      buildStatus = 'failing'
+    } else if (completed.some(matchRepo)) {
+      buildStatus = 'passing'
+    }
+  } catch {
+    // Redis unavailable — skip build status
   }
 
   return (
@@ -68,6 +92,22 @@ export default async function RepoDetailPage({ params }: Props) {
             {repo.fork && (
               <span className="text-xs px-2 py-0.5 rounded-full border border-blue-500/30 text-blue-600 bg-blue-500/10">
                 Fork
+              </span>
+            )}
+            {buildStatus !== 'none' && (
+              <span className={`text-xs px-2 py-0.5 rounded-full border inline-flex items-center gap-1 ${
+                buildStatus === 'passing'
+                  ? 'border-green-500/30 text-green-600 bg-green-500/10'
+                  : buildStatus === 'failing'
+                    ? 'border-red-500/30 text-red-600 bg-red-500/10'
+                    : 'border-blue-500/30 text-blue-600 bg-blue-500/10'
+              }`}>
+                {buildStatus === 'passing' ? <CheckCircle2 className="w-3 h-3" />
+                  : buildStatus === 'failing' ? <XCircle className="w-3 h-3" />
+                  : <Loader2 className="w-3 h-3 animate-spin" />}
+                {buildStatus === 'passing' ? 'Build passing'
+                  : buildStatus === 'failing' ? 'Build failing'
+                  : 'Build running'}
               </span>
             )}
           </div>
@@ -142,7 +182,7 @@ export default async function RepoDetailPage({ params }: Props) {
             <Play className="w-4 h-4" />
             Trigger Build
           </summary>
-          <TriggerBuildForm />
+          <TriggerBuildForm prefill={{ repoId: `${owner}/${repoName}`, branch: repo.default_branch }} />
         </details>
       </div>
     </main>

@@ -24,7 +24,12 @@ async function getJobs() {
     .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))
 }
 
-export default async function BuildsPage() {
+interface Props {
+  searchParams: Promise<{ repo?: string }>
+}
+
+export default async function BuildsPage({ searchParams }: Props) {
+  const { repo: repoFilter } = await searchParams
   const session = await getSession()
   if (!session) redirect('/login')
 
@@ -41,13 +46,20 @@ export default async function BuildsPage() {
     }
   }
 
+  if (jobs && repoFilter) {
+    jobs = jobs.filter((j) => {
+      const data = j.data as { repoId?: string } | undefined
+      return data?.repoId === repoFilter
+    })
+  }
+
   return (
     <main className="max-w-5xl mx-auto px-6 py-10">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-semibold">Builds</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            CI/CD build and deployment history
+            {repoFilter ? `Builds for ${repoFilter}` : 'CI/CD build and deployment history'}
           </p>
         </div>
       </div>
