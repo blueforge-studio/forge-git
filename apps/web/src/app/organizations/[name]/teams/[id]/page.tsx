@@ -2,9 +2,7 @@ import { getSession } from '@/lib/session'
 import { getTeam, listTeamMembers, listTeamRepos } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
-import AddTeamMemberForm from '@/components/add-team-member-form'
-import RemoveTeamMemberButton from '@/components/remove-team-member-button'
-import EditTeamForm from '@/components/edit-team-form'
+import TeamSidebar from '@/components/team-sidebar'
 import { Shield, ArrowLeft } from 'lucide-react'
 
 interface Props {
@@ -95,32 +93,7 @@ export default async function TeamDetailPage({ params }: Props) {
           )}
         </div>
 
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-sm font-semibold mb-3">Members</h2>
-            <div className="space-y-2">
-              {members.map((member) => (
-                <div key={member.id} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    {member.avatar_url ? (
-                      <img src={member.avatar_url} alt={member.login} className="w-5 h-5 rounded-full" />
-                    ) : (
-                      <div className="w-5 h-5 rounded-full bg-secondary" />
-                    )}
-                    <span>{member.full_name || member.login}</span>
-                  </div>
-                  <RemoveTeamMemberButton teamId={teamId} org={orgName} username={member.login} />
-                </div>
-              ))}
-            </div>
-            <AddTeamMemberForm teamId={teamId} org={orgName} />
-          </div>
-
-          <div>
-            <h2 className="text-sm font-semibold mb-3">Team Settings</h2>
-            <EditTeamForm team={team} org={orgName} />
-          </div>
-        </div>
+        <TeamSidebar team={team} orgName={orgName} members={members} />
       </div>
     </main>
   )

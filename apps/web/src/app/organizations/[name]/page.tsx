@@ -3,10 +3,8 @@ import { getOrg, listOrgMembers, listOrgTeams, listOrgRepos } from '@forge-git/g
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import RepoCard from '@/components/repo-card'
-import AddMemberForm from '@/components/add-member-form'
-import CreateTeamForm from '@/components/create-team-form'
-import RemoveMemberButton from '@/components/remove-member-button'
-import { Users, Shield, Settings } from 'lucide-react'
+import OrgSidebar from '@/components/org-sidebar'
+import { Settings } from 'lucide-react'
 
 interface Props {
   params: Promise<{ name: string }>
@@ -76,56 +74,7 @@ export default async function OrgDetailPage({ params }: Props) {
           )}
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Teams */}
-          <div>
-            <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <Shield className="w-4 h-4" /> Teams
-            </h2>
-            {teams.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No teams</p>
-            ) : (
-              <div className="space-y-2">
-                {teams.map((team) => (
-                  <div key={team.id} className="flex items-center justify-between text-sm">
-                    <Link
-                      href={`/organizations/${org.name}/teams/${team.id}`}
-                      className="hover:text-primary hover:underline"
-                    >
-                      {team.name}
-                    </Link>
-                    <span className="text-xs text-muted-foreground capitalize">{team.permission}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            <CreateTeamForm org={org.name} />
-          </div>
-
-          {/* Members */}
-          <div>
-            <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <Users className="w-4 h-4" /> Members
-            </h2>
-            <div className="space-y-2">
-              {members.map((member) => (
-                <div key={member.id} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    {member.avatar_url ? (
-                      <img src={member.avatar_url} alt={member.login} className="w-5 h-5 rounded-full" />
-                    ) : (
-                      <div className="w-5 h-5 rounded-full bg-secondary" />
-                    )}
-                    <span>{member.full_name || member.login}</span>
-                  </div>
-                  <RemoveMemberButton org={org.name} username={member.login} />
-                </div>
-              ))}
-            </div>
-            <AddMemberForm org={org.name} />
-          </div>
-        </div>
+        <OrgSidebar orgName={org.name} teams={teams} members={members} />
       </div>
     </main>
   )
