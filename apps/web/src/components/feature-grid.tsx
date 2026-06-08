@@ -1,4 +1,4 @@
-import { Server, Play, Users } from 'lucide-react'
+import { Server, Play, Users, GitPullRequest, CircleDot, Package } from 'lucide-react'
 import Link from 'next/link'
 
 const features = [
@@ -6,6 +6,21 @@ const features = [
     icon: Server,
     title: 'Git Hosting',
     description: 'Host repositories with full Git support, branch protection, deploy keys, and webhooks — powered by Gitea.',
+  },
+  {
+    icon: GitPullRequest,
+    title: 'Pull Requests',
+    description: 'Create, review, and merge pull requests. Close and reopen PRs with a clean, fast interface.',
+  },
+  {
+    icon: CircleDot,
+    title: 'Issue Tracking',
+    description: 'Track bugs and feature requests. Create, close, and reopen issues with full markdown support.',
+  },
+  {
+    icon: Package,
+    title: 'Release Management',
+    description: 'Publish releases with release notes, track versions, and manage your software delivery pipeline.',
   },
   {
     icon: Play,
@@ -21,7 +36,7 @@ const features = [
 
 export default function FeatureGrid() {
   return (
-    <div className="grid gap-4 sm:grid-cols-3 mb-10">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-10">
       {features.map(({ icon: Icon, title, description }) => (
         <div
           key={title}

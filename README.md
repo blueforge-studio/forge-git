@@ -1,11 +1,25 @@
 # forge-git
 
-Self-hosted Git platform — Gitea + Vercel UX + forge-hosting deployment pipeline.
+Self-hosted Git platform — Gitea-powered Git hosting with CI/CD, pull requests, issues, and releases.
+
+## Features
+
+- **Repositories** — Browse, create, and manage Git repositories (public/private)
+- **Pull Requests** — Create, review, merge, and close PRs
+- **Issues** — Track bugs and feature requests with issue management
+- **Releases** — Publish and manage software releases
+- **Branches & Commits** — Browse branches and commit history
+- **Webhooks** — Configure repository webhooks for automation
+- **Deploy Keys** — Manage SSH deploy keys per repository
+- **Branch Protection** — Set up branch protection rules
+- **Organizations** — Create orgs, manage teams and members
+- **CI/CD Pipeline** — Trigger builds, track queued/running/completed/failed jobs
+- **Dark Mode** — Light/dark theme with system preference detection
 
 ## Stack
 
 - **Gitea** — Git hosting, web UI, user management
-- **Next.js 15** — Web UI (React 19, Tailwind 4)
+- **Next.js 16** — Web UI (React 19, Tailwind 4, Turbopack)
 - **BullMQ + Redis** — CI/CD job queue
 - **Docker** — Isolated build workers
 - **MinIO** — Build artifacts + cache storage
@@ -26,12 +40,7 @@ Self-hosted Git platform — Gitea + Vercel UX + forge-hosting deployment pipeli
                │
 ┌──────────────▼──────────────────────────────┐
 │         @forge-git/web (Next.js)            │
-│   Org/repo management UI + CI config        │
-└─────────────────────────────────────────────┘
-
-┌──────────────▼──────────────────────────────┐
-│          @forge-git/api (Hono)             │
-│    Org + team management + webhook proxy    │
+│   Git platform UI + build dashboard         │
 └──────────────┬──────────────────────────────┘
                │ BullMQ
 ┌──────────────▼──────────────────────────────┐
@@ -61,9 +70,10 @@ pnpm --filter @forge-git/deploy-runner dev
 | Package | Description |
 |---------|-------------|
 | `@forge-git/web` | Next.js web UI |
-| `@forge-git/ui` | shadcn-style React components |
-| `@forge-git/gitea-bridge` | Typed Gitea API client |
+| `@forge-git/ui` | shadcn-style React components (Button, Input, Badge, etc.) |
+| `@forge-git/gitea-bridge` | Typed Gitea API client (repos, orgs, PRs, issues, releases, webhooks, etc.) |
 | `@forge-git/deploy-runner` | BullMQ CI/CD worker |
+| `@forge-git/cli` | CLI tools for token generation and management |
 
 ## Environment Variables
 
@@ -74,7 +84,6 @@ REDIS_URL=redis://localhost:6379
 MINIO_URL=http://localhost:9000
 MINIO_ACCESS_KEY=
 MINIO_SECRET_KEY=
-JWT_SECRET=             # For forge-git API auth
 ```
 
 ## .forge-git.yml Syntax
@@ -113,7 +122,6 @@ jobs:
 |---------|------|
 | Gitea | 3001 |
 | forge-git web | 3000 |
-| forge-git API | 3002 |
 | MinIO console | 9001 |
 | PostgreSQL | 5432 |
 | Redis | 6379 |
