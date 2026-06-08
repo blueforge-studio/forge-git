@@ -7,22 +7,27 @@
  * Gitea API docs: https://docs.gitea.com/api/1.21/overview
  */
 
-function getGiteaUrl(): string {
-  return process.env.GITEA_URL ?? process.env.FORGE_GIT_URL ?? 'http://localhost:3001'
-}
-function getGiteaToken(): string {
-  return process.env.GITEA_TOKEN ?? process.env.FORGE_GIT_TOKEN ?? ''
+export interface GiteaOpts {
+  token?: string
+  baseUrl?: string
 }
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const url = `${getGiteaUrl()}/api/v1${path}`
+function getGiteaUrl(baseUrl?: string): string {
+  return baseUrl ?? process.env.GITEA_URL ?? process.env.FORGE_GIT_URL ?? 'http://localhost:3001'
+}
+function getGiteaToken(token?: string): string {
+  return token ?? process.env.GITEA_TOKEN ?? process.env.FORGE_GIT_TOKEN ?? ''
+}
+
+async function request<T>(path: string, opts?: { init?: RequestInit } & GiteaOpts): Promise<T> {
+  const url = `${getGiteaUrl(opts?.baseUrl)}/api/v1${path}`
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${getGiteaToken()}`,
-      ...options?.headers,
+      Authorization: `Bearer ${getGiteaToken(opts?.token)}`,
+      ...opts?.init?.headers,
     },
-    ...options,
+    ...opts?.init,
   })
   if (!res.ok) {
     const text = await res.text().catch(() => '')
@@ -46,12 +51,12 @@ export interface GiteaUser {
   last_login?: string
 }
 
-export async function getCurrentUser(): Promise<GiteaUser> {
-  return request<GiteaUser>('/user')
+export async function getCurrentUser(opts?: GiteaOpts): Promise<GiteaUser> {
+  return request<GiteaUser>('/user', opts)
 }
 
-export async function getUser(username: string): Promise<GiteaUser> {
-  return request<GiteaUser>(`/users/${username}`)
+export async function getUser(username: string, opts?: GiteaOpts): Promise<GiteaUser> {
+  return request<GiteaUser>(`/users/${username}`, opts)
 }
 
 // ─── Organizations ─────────────────────────────────────────────────────────
@@ -78,18 +83,21 @@ export interface CreateOrgRequest {
   visibility?: 'public' | 'limited' | 'private'
 }
 
-export async function listOrgs(): Promise<GiteaOrg[]> {
-  return request<GiteaOrg[]>('/user/orgs')
+export async function listOrgs(opts?: GiteaOpts): Promise<GiteaOrg[]> {
+  return request<GiteaOrg[]>('/user/orgs', opts)
 }
 
-export async function getOrg(orgName: string): Promise<GiteaOrg> {
-  return request<GiteaOrg>(`/orgs/${orgName}`)
+export async function getOrg(orgName: string, opts?: GiteaOpts): Promise<GiteaOrg> {
+  return request<GiteaOrg>(`/orgs/${orgName}`, opts)
 }
 
-export async function createOrg(data: CreateOrgRequest): Promise<GiteaOrg> {
+export async function createOrg(data: CreateOrgRequest, opts?: GiteaOpts): Promise<GiteaOrg> {
   return request<GiteaOrg>('/orgs', {
-    method: 'POST',
-    body: JSON.stringify(data),
+    init: {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    ...opts,
   })
 }
 
@@ -132,34 +140,43 @@ export interface CreateRepoRequest {
   readme?: string
 }
 
-export async function listUserRepos(username: string): Promise<GiteaRepo[]> {
-  return request<GiteaRepo[]>(`/users/${username}/repos`)
+export async function listUserRepos(username: string, opts?: GiteaOpts): Promise<GiteaRepo[]> {
+  return request<GiteaRepo[]>(`/users/${username}/repos`, opts)
 }
 
-export async function listOrgRepos(org: string): Promise<GiteaRepo[]> {
-  return request<GiteaRepo[]>(`/orgs/${org}/repos`)
+export async function listOrgRepos(org: string, opts?: GiteaOpts): Promise<GiteaRepo[]> {
+  return request<GiteaRepo[]>(`/orgs/${org}/repos`, opts)
 }
 
-export async function getRepo(owner: string, repo: string): Promise<GiteaRepo> {
-  return request<GiteaRepo>(`/repos/${owner}/${repo}`)
+export async function getRepo(owner: string, repo: string, opts?: GiteaOpts): Promise<GiteaRepo> {
+  return request<GiteaRepo>(`/repos/${owner}/${repo}`, opts)
 }
 
-export async function createRepo(data: CreateRepoRequest): Promise<GiteaRepo> {
+export async function createRepo(data: CreateRepoRequest, opts?: GiteaOpts): Promise<GiteaRepo> {
   return request<GiteaRepo>('/user/repos', {
-    method: 'POST',
-    body: JSON.stringify(data),
+    init: {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    ...opts,
   })
 }
 
-export async function createOrgRepo(org: string, data: CreateRepoRequest): Promise<GiteaRepo> {
+export async function createOrgRepo(org: string, data: CreateRepoRequest, opts?: GiteaOpts): Promise<GiteaRepo> {
   return request<GiteaRepo>(`/orgs/${org}/repos`, {
-    method: 'POST',
-    body: JSON.stringify(data),
+    init: {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    ...opts,
   })
 }
 
-export async function deleteRepo(owner: string, repo: string): Promise<void> {
-  return request<void>(`/repos/${owner}/${repo}`, { method: 'DELETE' })
+export async function deleteRepo(owner: string, repo: string, opts?: GiteaOpts): Promise<void> {
+  return request<void>(`/repos/${owner}/${repo}`, {
+    init: { method: 'DELETE' },
+    ...opts,
+  })
 }
 
 // ─── Repository Keys (Deploy Keys) ───────────────────────────────────────────
@@ -173,19 +190,25 @@ export interface RepoKey {
   read_only: boolean
 }
 
-export async function listRepoKeys(owner: string, repo: string): Promise<RepoKey[]> {
-  return request<RepoKey[]>(`/repos/${owner}/${repo}/keys`)
+export async function listRepoKeys(owner: string, repo: string, opts?: GiteaOpts): Promise<RepoKey[]> {
+  return request<RepoKey[]>(`/repos/${owner}/${repo}/keys`, opts)
 }
 
-export async function addRepoKey(owner: string, repo: string, data: { title: string; key: string; read_only?: boolean }): Promise<RepoKey> {
+export async function addRepoKey(owner: string, repo: string, data: { title: string; key: string; read_only?: boolean }, opts?: GiteaOpts): Promise<RepoKey> {
   return request<RepoKey>(`/repos/${owner}/${repo}/keys`, {
-    method: 'POST',
-    body: JSON.stringify(data),
+    init: {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    ...opts,
   })
 }
 
-export async function deleteRepoKey(owner: string, repo: string, keyId: number): Promise<void> {
-  return request<void>(`/repos/${owner}/${repo}/keys/${keyId}`, { method: 'DELETE' })
+export async function deleteRepoKey(owner: string, repo: string, keyId: number, opts?: GiteaOpts): Promise<void> {
+  return request<void>(`/repos/${owner}/${repo}/keys/${keyId}`, {
+    init: { method: 'DELETE' },
+    ...opts,
+  })
 }
 
 // ─── Webhooks ───────────────────────────────────────────────────────────────
@@ -204,8 +227,8 @@ export interface Webhook {
   created_at: string
 }
 
-export async function listWebhooks(owner: string, repo: string): Promise<Webhook[]> {
-  return request<Webhook[]>(`/repos/${owner}/${repo}/hooks`)
+export async function listWebhooks(owner: string, repo: string, opts?: GiteaOpts): Promise<Webhook[]> {
+  return request<Webhook[]>(`/repos/${owner}/${repo}/hooks`, opts)
 }
 
 export async function createWebhook(owner: string, repo: string, data: {
@@ -213,15 +236,21 @@ export async function createWebhook(owner: string, repo: string, data: {
   config: { url: string; content_type: string; secret?: string }
   events?: string[]
   active?: boolean
-}): Promise<Webhook> {
+}, opts?: GiteaOpts): Promise<Webhook> {
   return request<Webhook>(`/repos/${owner}/${repo}/hooks`, {
-    method: 'POST',
-    body: JSON.stringify(data),
+    init: {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    ...opts,
   })
 }
 
-export async function deleteWebhook(owner: string, repo: string, hookId: number): Promise<void> {
-  return request<void>(`/repos/${owner}/${repo}/hooks/${hookId}`, { method: 'DELETE' })
+export async function deleteWebhook(owner: string, repo: string, hookId: number, opts?: GiteaOpts): Promise<void> {
+  return request<void>(`/repos/${owner}/${repo}/hooks/${hookId}`, {
+    init: { method: 'DELETE' },
+    ...opts,
+  })
 }
 
 // ─── Branch Protection ───────────────────────────────────────────────────────
@@ -240,14 +269,17 @@ export interface BranchProtection {
   dismiss_stale_approvals: boolean
 }
 
-export async function getBranchProtection(owner: string, repo: string, branch: string): Promise<BranchProtection> {
-  return request<BranchProtection>(`/repos/${owner}/${repo}/branch_protections/${encodeURIComponent(branch)}`)
+export async function getBranchProtection(owner: string, repo: string, branch: string, opts?: GiteaOpts): Promise<BranchProtection> {
+  return request<BranchProtection>(`/repos/${owner}/${repo}/branch_protections/${encodeURIComponent(branch)}`, opts)
 }
 
-export async function setBranchProtection(owner: string, repo: string, branch: string, data: BranchProtection): Promise<BranchProtection> {
+export async function setBranchProtection(owner: string, repo: string, branch: string, data: BranchProtection, opts?: GiteaOpts): Promise<BranchProtection> {
   return request<BranchProtection>(`/repos/${owner}/${repo}/branch_protections/${encodeURIComponent(branch)}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
+    init: {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    },
+    ...opts,
   })
 }
 
@@ -261,16 +293,22 @@ export interface OrgMember {
   avatar_url: string
 }
 
-export async function listOrgMembers(org: string): Promise<OrgMember[]> {
-  return request<OrgMember[]>(`/orgs/${org}/members`)
+export async function listOrgMembers(org: string, opts?: GiteaOpts): Promise<OrgMember[]> {
+  return request<OrgMember[]>(`/orgs/${org}/members`, opts)
 }
 
-export async function addOrgMember(org: string, username: string): Promise<void> {
-  return request<void>(`/orgs/${org}/members/${username}`, { method: 'PUT' })
+export async function addOrgMember(org: string, username: string, opts?: GiteaOpts): Promise<void> {
+  return request<void>(`/orgs/${org}/members/${username}`, {
+    init: { method: 'PUT' },
+    ...opts,
+  })
 }
 
-export async function removeOrgMember(org: string, username: string): Promise<void> {
-  return request<void>(`/orgs/${org}/members/${username}`, { method: 'DELETE' })
+export async function removeOrgMember(org: string, username: string, opts?: GiteaOpts): Promise<void> {
+  return request<void>(`/orgs/${org}/members/${username}`, {
+    init: { method: 'DELETE' },
+    ...opts,
+  })
 }
 
 // ─── Organization Teams ──────────────────────────────────────────────────────
@@ -286,8 +324,8 @@ export interface Team {
   created_at: string
 }
 
-export async function listOrgTeams(org: string): Promise<Team[]> {
-  return request<Team[]>(`/orgs/${org}/teams`)
+export async function listOrgTeams(org: string, opts?: GiteaOpts): Promise<Team[]> {
+  return request<Team[]>(`/orgs/${org}/teams`, opts)
 }
 
 export async function createTeam(org: string, data: {
@@ -295,10 +333,13 @@ export async function createTeam(org: string, data: {
   description?: string
   permission?: 'read' | 'write' | 'admin'
   repo_names?: string[]
-}): Promise<Team> {
+}, opts?: GiteaOpts): Promise<Team> {
   return request<Team>(`/orgs/${org}/teams`, {
-    method: 'POST',
-    body: JSON.stringify(data),
+    init: {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    ...opts,
   })
 }
 
