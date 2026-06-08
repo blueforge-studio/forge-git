@@ -2,6 +2,7 @@ import { getSession } from '@/lib/session'
 import { getRelease } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
+import { Button } from '@forge-git/ui'
 import RepoSettingsNav from '@/components/repo-settings-nav'
 import { Tag, Download, Archive } from 'lucide-react'
 
@@ -89,20 +90,18 @@ export default async function ReleaseDetailPage({ params }: Props) {
       </div>
 
       <div className="flex items-center gap-3 mt-6">
-        <a
-          href={release.zipball_url}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-md text-xs font-medium hover:bg-secondary/30 transition-colors"
-        >
-          <Archive className="w-3.5 h-3.5" />
-          Download ZIP
-        </a>
-        <a
-          href={release.tarball_url}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-md text-xs font-medium hover:bg-secondary/30 transition-colors"
-        >
-          <Download className="w-3.5 h-3.5" />
-          Download TAR
-        </a>
+        <Button variant="outline" size="sm" asChild>
+          <a href={release.zipball_url}>
+            <Archive className="w-3.5 h-3.5" />
+            Download ZIP
+          </a>
+        </Button>
+        <Button variant="outline" size="sm" asChild>
+          <a href={release.tarball_url}>
+            <Download className="w-3.5 h-3.5" />
+            Download TAR
+          </a>
+        </Button>
       </div>
     </main>
   )

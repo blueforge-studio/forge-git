@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { createRepoAction } from '@/app/repositories/actions'
+import { Button, Input, Label, Select } from '@forge-git/ui'
 
 export default function CreateRepoForm() {
   const [state, formAction, pending] = useActionState(createRepoAction, { error: '', field: '' })
@@ -9,16 +10,13 @@ export default function CreateRepoForm() {
   return (
     <form action={formAction} className="space-y-4">
       <div>
-        <label className="text-sm font-medium" htmlFor="name">
-          Repository name *
-        </label>
-        <input
+        <Label htmlFor="name">Repository name *</Label>
+        <Input
           id="name"
           name="name"
           type="text"
           placeholder="my-project"
           autoFocus
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
         {state.field === 'name' && state.error && (
           <p className="text-xs text-destructive mt-1">{state.error}</p>
@@ -26,20 +24,17 @@ export default function CreateRepoForm() {
       </div>
 
       <div>
-        <label className="text-sm font-medium" htmlFor="description">
-          Description
-        </label>
-        <input
+        <Label htmlFor="description">Description</Label>
+        <Input
           id="description"
           name="description"
           type="text"
           placeholder="Optional description"
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
 
       <div>
-        <label className="text-sm font-medium">Visibility</label>
+        <Label>Visibility</Label>
         <div className="mt-1 flex items-center gap-4">
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -64,37 +59,25 @@ export default function CreateRepoForm() {
       </div>
 
       <div>
-        <label className="text-sm font-medium" htmlFor="gitignore">
-          .gitignore template
-        </label>
-        <select
-          id="gitignore"
-          name="gitignore"
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        >
+        <Label htmlFor="gitignore">.gitignore template</Label>
+        <Select id="gitignore" name="gitignore">
           <option value="">None</option>
           <option value="Node">Node</option>
           <option value="Python">Python</option>
           <option value="Go">Go</option>
           <option value="Rust">Rust</option>
           <option value="Java">Java</option>
-        </select>
+        </Select>
       </div>
 
       <div>
-        <label className="text-sm font-medium" htmlFor="license">
-          License
-        </label>
-        <select
-          id="license"
-          name="license"
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        >
+        <Label htmlFor="license">License</Label>
+        <Select id="license" name="license">
           <option value="">None</option>
           <option value="MIT">MIT</option>
           <option value="Apache-2.0">Apache 2.0</option>
           <option value="GPL-3.0">GPL 3.0</option>
-        </select>
+        </Select>
       </div>
 
       {state.error && !state.field && (
@@ -104,13 +87,9 @@ export default function CreateRepoForm() {
       )}
 
       <div className="flex items-center gap-3 pt-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
-        >
+        <Button type="submit" disabled={pending}>
           {pending ? 'Creating...' : 'Create Repository'}
-        </button>
+        </Button>
         <a
           href="/repositories"
           className="text-sm text-muted-foreground hover:text-foreground"

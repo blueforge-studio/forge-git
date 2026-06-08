@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Button } from '@forge-git/ui'
 
 export default function NotFound() {
   return (
@@ -8,12 +9,9 @@ export default function NotFound() {
       <p className="text-sm text-muted-foreground mb-6">
         The page you are looking for does not exist or has been moved.
       </p>
-      <Link
-        href="/"
-        className="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90"
-      >
-        Go Home
-      </Link>
+      <Button asChild>
+        <Link href="/">Go Home</Link>
+      </Button>
     </main>
   )
 }

@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import type { BranchProtection } from '@forge-git/gitea-bridge'
 import { setBranchProtectionAction } from '@/app/repositories/actions'
+import { Button, Input, Label } from '@forge-git/ui'
 
 export default function BranchProtectionForm({
   owner,
@@ -44,16 +45,15 @@ export default function BranchProtectionForm({
       </label>
 
       <div>
-        <label className="text-sm font-medium" htmlFor="status_check_contexts">
+        <Label htmlFor="status_check_contexts">
           Status check contexts
-        </label>
-        <input
+        </Label>
+        <Input
           id="status_check_contexts"
           name="status_check_contexts"
           type="text"
           placeholder="ci/build, ci/test"
           defaultValue={initialData?.status_check_contexts?.join(', ')}
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
 
@@ -63,16 +63,15 @@ export default function BranchProtectionForm({
       </label>
 
       <div>
-        <label className="text-sm font-medium" htmlFor="push_whitelist_usernames">
+        <Label htmlFor="push_whitelist_usernames">
           Allowed pushers
-        </label>
-        <input
+        </Label>
+        <Input
           id="push_whitelist_usernames"
           name="push_whitelist_usernames"
           type="text"
           placeholder="user1, user2"
           defaultValue={initialData?.push_whitelist_usernames?.join(', ')}
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
 
@@ -82,13 +81,9 @@ export default function BranchProtectionForm({
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={pending}>
         {pending ? 'Saving...' : 'Save Changes'}
-      </button>
+      </Button>
     </form>
   )
 }

@@ -2,6 +2,7 @@ import { getSession } from '@/lib/session'
 import { listOrgs } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Button } from '@forge-git/ui'
 import EmptyState from '@/components/empty-state'
 import { Building2, Plus } from 'lucide-react'
 
@@ -34,13 +35,12 @@ export default async function OrganizationsPage() {
             Organizations you belong to on {session.baseUrl}
           </p>
         </div>
-        <Link
-          href="/organizations/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90"
-        >
-          <Plus className="w-4 h-4" />
-          New Organization
-        </Link>
+        <Button asChild>
+          <Link href="/organizations/new">
+            <Plus className="w-4 h-4" />
+            New Organization
+          </Link>
+        </Button>
       </div>
 
       {orgs.length === 0 ? (

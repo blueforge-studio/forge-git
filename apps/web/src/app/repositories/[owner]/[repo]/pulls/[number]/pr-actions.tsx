@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { closePullRequestAction, reopenPullRequestAction, mergePullRequestAction } from './actions'
+import { Button } from '@forge-git/ui'
 
 interface Props {
   owner: string
@@ -36,30 +37,33 @@ export default function PullRequestActions({ owner, repo, prNumber, state, merge
       <div className="flex items-center gap-2">
         {state === 'open' && (
           <>
-            <button
+            <Button
+              variant="success"
+              size="sm"
               onClick={() => act('merge')}
               disabled={pending !== null}
-              className="inline-flex items-center h-8 px-3 rounded-md bg-green-600 text-white text-xs font-medium hover:opacity-90 disabled:opacity-50"
             >
               {pending === 'merge' ? 'Merging...' : 'Merge'}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
               onClick={() => act('close')}
               disabled={pending !== null}
-              className="inline-flex items-center h-8 px-3 rounded-md border border-destructive/30 text-destructive text-xs font-medium hover:bg-destructive/10 disabled:opacity-50"
             >
               {pending === 'close' ? 'Closing...' : 'Close'}
-            </button>
+            </Button>
           </>
         )}
         {state === 'closed' && !merged && (
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => act('reopen')}
             disabled={pending !== null}
-            className="inline-flex items-center h-8 px-3 rounded-md border border-border text-xs font-medium hover:bg-secondary/30 disabled:opacity-50"
           >
             {pending === 'reopen' ? 'Reopening...' : 'Reopen'}
-          </button>
+          </Button>
         )}
       </div>
       {error && <p className="text-xs text-destructive mt-2">{error}</p>}

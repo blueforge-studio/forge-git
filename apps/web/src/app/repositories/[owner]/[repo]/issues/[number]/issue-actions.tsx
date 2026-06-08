@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { closeIssueAction, reopenIssueAction } from './actions'
+import { Button } from '@forge-git/ui'
 
 interface Props {
   owner: string
@@ -30,22 +31,24 @@ export default function IssueActions({ owner, repo, issueNumber, state }: Props)
     <div>
       <div className="flex items-center gap-2">
         {state === 'open' && (
-          <button
+          <Button
+            variant="destructive"
+            size="sm"
             onClick={() => act('close')}
             disabled={pending !== null}
-            className="inline-flex items-center h-8 px-3 rounded-md border border-destructive/30 text-destructive text-xs font-medium hover:bg-destructive/10 disabled:opacity-50"
           >
             {pending === 'close' ? 'Closing...' : 'Close Issue'}
-          </button>
+          </Button>
         )}
         {state === 'closed' && (
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => act('reopen')}
             disabled={pending !== null}
-            className="inline-flex items-center h-8 px-3 rounded-md border border-border text-xs font-medium hover:bg-secondary/30 disabled:opacity-50"
           >
             {pending === 'reopen' ? 'Reopening...' : 'Reopen Issue'}
-          </button>
+          </Button>
         )}
       </div>
       {error && <p className="text-xs text-destructive mt-2">{error}</p>}

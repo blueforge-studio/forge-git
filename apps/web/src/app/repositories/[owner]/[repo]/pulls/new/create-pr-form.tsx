@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { createPullRequestAction } from './actions'
+import { Button, Input, Label, Textarea, Select } from '@forge-git/ui'
 
 export default function CreatePullRequestForm({
   owner,
@@ -23,98 +24,72 @@ export default function CreatePullRequestForm({
       <input type="hidden" name="repo" value={repo} />
 
       <div>
-        <label htmlFor="title" className="block text-sm font-medium mb-1">
-          Title *
-        </label>
-        <input
+        <Label htmlFor="title">Title *</Label>
+        <Input
           id="title"
           name="title"
           type="text"
           required
           placeholder="Pull request title"
-          className={`flex h-9 w-full rounded-md border px-3 py-1 text-sm bg-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
-            state.field === 'title' ? 'border-destructive' : 'border-input'
-          }`}
+          className={state.field === 'title' ? 'border-destructive' : ''}
         />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="head" className="block text-sm font-medium mb-1">
-            Head Branch *
-          </label>
+          <Label htmlFor="head">Head Branch *</Label>
           {branches.length > 0 ? (
-            <select
-              id="head"
-              name="head"
-              required
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
+            <Select id="head" name="head" required>
               <option value="">Select branch...</option>
               {branches.map((b) => (
                 <option key={b} value={b}>
                   {b}
                 </option>
               ))}
-            </select>
+            </Select>
           ) : (
-            <input
+            <Input
               id="head"
               name="head"
               type="text"
               required
               placeholder="feature-branch"
-              className={`flex h-9 w-full rounded-md border px-3 py-1 text-sm bg-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
-                state.field === 'head' ? 'border-destructive' : 'border-input'
-              }`}
+              className={state.field === 'head' ? 'border-destructive' : ''}
             />
           )}
         </div>
 
         <div>
-          <label htmlFor="base" className="block text-sm font-medium mb-1">
-            Base Branch *
-          </label>
+          <Label htmlFor="base">Base Branch *</Label>
           {branches.length > 0 ? (
-            <select
-              id="base"
-              name="base"
-              required
-              defaultValue="main"
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
+            <Select id="base" name="base" required defaultValue="main">
               {branches.map((b) => (
                 <option key={b} value={b}>
                   {b}
                 </option>
               ))}
-            </select>
+            </Select>
           ) : (
-            <input
+            <Input
               id="base"
               name="base"
               type="text"
               required
               defaultValue="main"
               placeholder="main"
-              className={`flex h-9 w-full rounded-md border px-3 py-1 text-sm bg-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
-                state.field === 'base' ? 'border-destructive' : 'border-input'
-              }`}
+              className={state.field === 'base' ? 'border-destructive' : ''}
             />
           )}
         </div>
       </div>
 
       <div>
-        <label htmlFor="body" className="block text-sm font-medium mb-1">
-          Description
-        </label>
-        <textarea
+        <Label htmlFor="body">Description</Label>
+        <Textarea
           id="body"
           name="body"
           rows={6}
           placeholder="Describe the changes..."
-          className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-y"
         />
       </div>
 
@@ -122,13 +97,9 @@ export default function CreatePullRequestForm({
         <p className="text-sm text-destructive">{state.error}</p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={pending}>
         {pending ? 'Creating...' : 'Create Pull Request'}
-      </button>
+      </Button>
     </form>
   )
 }

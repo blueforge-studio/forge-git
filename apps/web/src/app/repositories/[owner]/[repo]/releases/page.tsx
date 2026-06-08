@@ -2,6 +2,7 @@ import { getSession } from '@/lib/session'
 import { listReleases } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Button } from '@forge-git/ui'
 import RepoSettingsNav from '@/components/repo-settings-nav'
 import { Tag, Download } from 'lucide-react'
 
@@ -36,13 +37,12 @@ export default async function ReleasesPage({ params }: Props) {
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Releases</h2>
-        <Link
-          href={`/repositories/${owner}/${repo}/releases/new`}
-          className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:opacity-90"
-        >
-          <Tag className="w-3.5 h-3.5" />
-          New Release
-        </Link>
+        <Button asChild size="sm">
+          <Link href={`/repositories/${owner}/${repo}/releases/new`}>
+            <Tag className="w-3.5 h-3.5" />
+            New Release
+          </Link>
+        </Button>
       </div>
 
       {releases.length === 0 ? (

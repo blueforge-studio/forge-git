@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { createOrgAction } from '@/app/organizations/actions'
+import { Button, Input, Label } from '@forge-git/ui'
 
 export default function CreateOrgForm() {
   const [state, formAction, pending] = useActionState(createOrgAction, { error: '', field: '' })
@@ -9,16 +10,13 @@ export default function CreateOrgForm() {
   return (
     <form action={formAction} className="space-y-4">
       <div>
-        <label className="text-sm font-medium" htmlFor="name">
-          Organization name *
-        </label>
-        <input
+        <Label htmlFor="name">Organization name *</Label>
+        <Input
           id="name"
           name="name"
           type="text"
           placeholder="my-org"
           autoFocus
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
         {state.field === 'name' && state.error && (
           <p className="text-xs text-destructive mt-1">{state.error}</p>
@@ -26,33 +24,27 @@ export default function CreateOrgForm() {
       </div>
 
       <div>
-        <label className="text-sm font-medium" htmlFor="full_name">
-          Display name
-        </label>
-        <input
+        <Label htmlFor="full_name">Display name</Label>
+        <Input
           id="full_name"
           name="full_name"
           type="text"
           placeholder="My Organization"
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
 
       <div>
-        <label className="text-sm font-medium" htmlFor="description">
-          Description
-        </label>
-        <input
+        <Label htmlFor="description">Description</Label>
+        <Input
           id="description"
           name="description"
           type="text"
           placeholder="Optional description"
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
 
       <div>
-        <label className="text-sm font-medium">Visibility</label>
+        <Label>Visibility</Label>
         <div className="mt-1 flex items-center gap-4">
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -92,13 +84,9 @@ export default function CreateOrgForm() {
       )}
 
       <div className="flex items-center gap-3 pt-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
-        >
+        <Button type="submit" disabled={pending}>
           {pending ? 'Creating...' : 'Create Organization'}
-        </button>
+        </Button>
         <a
           href="/organizations"
           className="text-sm text-muted-foreground hover:text-foreground"

@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { updateProfileAction } from './actions'
+import { Button, Input, Label } from '@forge-git/ui'
 
 interface Props {
   defaults: {
@@ -23,55 +24,43 @@ export default function EditProfileForm({ defaults }: Props) {
     <form action={formAction} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="full_name" className="block text-sm font-medium mb-1">
-            Full Name
-          </label>
-          <input
+          <Label htmlFor="full_name">Full Name</Label>
+          <Input
             id="full_name"
             name="full_name"
             type="text"
             defaultValue={defaults.full_name || ''}
             placeholder="Your name"
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-1">
-            Email
-          </label>
-          <input
+          <Label htmlFor="email">Email</Label>
+          <Input
             id="email"
             name="email"
             type="email"
             defaultValue={defaults.email || ''}
             placeholder="you@example.com"
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           />
         </div>
         <div>
-          <label htmlFor="location" className="block text-sm font-medium mb-1">
-            Location
-          </label>
-          <input
+          <Label htmlFor="location">Location</Label>
+          <Input
             id="location"
             name="location"
             type="text"
             defaultValue={defaults.location || ''}
             placeholder="City, Country"
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           />
         </div>
         <div>
-          <label htmlFor="website" className="block text-sm font-medium mb-1">
-            Website
-          </label>
-          <input
+          <Label htmlFor="website">Website</Label>
+          <Input
             id="website"
             name="website"
             type="url"
             defaultValue={defaults.website || ''}
             placeholder="https://example.com"
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           />
         </div>
       </div>
@@ -79,13 +68,9 @@ export default function EditProfileForm({ defaults }: Props) {
       {state.error && <p className="text-sm text-destructive">{state.error}</p>}
       {state.success && <p className="text-sm text-green-600">{state.success}</p>}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={pending}>
         {pending ? 'Saving...' : 'Save Changes'}
-      </button>
+      </Button>
     </form>
   )
 }

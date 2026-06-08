@@ -1,5 +1,6 @@
 import { type LucideIcon } from 'lucide-react'
 import Link from 'next/link'
+import { Button } from '@forge-git/ui'
 
 interface EmptyStateProps {
   icon: LucideIcon
@@ -22,12 +23,9 @@ export default function EmptyState({
       <h2 className="text-lg font-medium mb-1">{title}</h2>
       <p className="text-sm text-muted-foreground mb-4">{description}</p>
       {actionLabel && actionHref && (
-        <Link
-          href={actionHref}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90"
-        >
-          {actionLabel}
-        </Link>
+        <Button asChild>
+          <Link href={actionHref}>{actionLabel}</Link>
+        </Button>
       )}
     </div>
   )

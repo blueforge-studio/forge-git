@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { login } from './actions'
 import { Server } from 'lucide-react'
+import { Button, Input, Label } from '@forge-git/ui'
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, { error: '' })
@@ -20,28 +21,26 @@ export default function LoginPage() {
 
         <form action={formAction} className="space-y-4">
           <div>
-            <label className="text-sm font-medium" htmlFor="giteaUrl">
+            <Label htmlFor="giteaUrl">
               Gitea URL
-            </label>
-            <input
+            </Label>
+            <Input
               id="giteaUrl"
               name="giteaUrl"
               type="text"
               placeholder="https://forge-git.blueforge.studio"
-              className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium" htmlFor="token">
+            <Label htmlFor="token">
               Personal Access Token
-            </label>
-            <input
+            </Label>
+            <Input
               id="token"
               name="token"
               type="password"
               placeholder="Paste your token"
-              className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
             <p className="text-xs text-muted-foreground mt-1">
               Generate one at your Gitea user settings → Applications
@@ -54,13 +53,9 @@ export default function LoginPage() {
             </p>
           )}
 
-          <button
-            type="submit"
-            disabled={pending}
-            className="w-full inline-flex items-center justify-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
-          >
+          <Button type="submit" disabled={pending} className="w-full">
             {pending ? 'Signing in...' : 'Sign in'}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

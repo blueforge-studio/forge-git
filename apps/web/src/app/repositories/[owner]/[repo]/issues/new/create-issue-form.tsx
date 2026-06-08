@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { createIssueAction } from './actions'
+import { Button, Input, Label, Textarea } from '@forge-git/ui'
 
 export default function CreateIssueForm({ owner, repo }: { owner: string; repo: string }) {
   const [state, formAction, pending] = useActionState(createIssueAction, {
@@ -15,44 +16,34 @@ export default function CreateIssueForm({ owner, repo }: { owner: string; repo: 
       <input type="hidden" name="repo" value={repo} />
 
       <div>
-        <label htmlFor="title" className="block text-sm font-medium mb-1">
-          Title *
-        </label>
-        <input
+        <Label htmlFor="title">Title *</Label>
+        <Input
           id="title"
           name="title"
           type="text"
           required
           placeholder="Issue title"
-          className={`flex h-9 w-full rounded-md border px-3 py-1 text-sm bg-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
-            state.field === 'title' ? 'border-destructive' : 'border-input'
-          }`}
+          className={state.field === 'title' ? 'border-destructive' : ''}
         />
       </div>
 
       <div>
-        <label htmlFor="body" className="block text-sm font-medium mb-1">
-          Description
-        </label>
-        <textarea
+        <Label htmlFor="body">Description</Label>
+        <Textarea
           id="body"
           name="body"
           rows={6}
           placeholder="Describe the issue..."
-          className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-y"
         />
       </div>
 
       <div>
-        <label htmlFor="labels" className="block text-sm font-medium mb-1">
-          Labels
-        </label>
-        <input
+        <Label htmlFor="labels">Labels</Label>
+        <Input
           id="labels"
           name="labels"
           type="text"
           placeholder="bug, enhancement (comma-separated)"
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
 
@@ -60,13 +51,9 @@ export default function CreateIssueForm({ owner, repo }: { owner: string; repo: 
         <p className="text-sm text-destructive">{state.error}</p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={pending}>
         {pending ? 'Creating...' : 'Create Issue'}
-      </button>
+      </Button>
     </form>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { createReleaseAction } from './actions'
+import { Button, Input, Label, Textarea } from '@forge-git/ui'
 
 export default function CreateReleaseForm({ owner, repo }: { owner: string; repo: string }) {
   const [state, formAction, pending] = useActionState(createReleaseAction, {
@@ -15,47 +16,36 @@ export default function CreateReleaseForm({ owner, repo }: { owner: string; repo
       <input type="hidden" name="repo" value={repo} />
 
       <div>
-        <label htmlFor="tag_name" className="block text-sm font-medium mb-1">
-          Tag Name *
-        </label>
-        <input
+        <Label htmlFor="tag_name">Tag Name *</Label>
+        <Input
           id="tag_name"
           name="tag_name"
           type="text"
           required
           placeholder="v1.0.0"
-          className={`flex h-9 w-full rounded-md border px-3 py-1 text-sm bg-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
-            state.field === 'tag_name' ? 'border-destructive' : 'border-input'
-          }`}
+          className={state.field === 'tag_name' ? 'border-destructive' : ''}
         />
       </div>
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium mb-1">
-          Release Title *
-        </label>
-        <input
+        <Label htmlFor="name">Release Title *</Label>
+        <Input
           id="name"
           name="name"
           type="text"
           required
           placeholder="First Release"
-          className={`flex h-9 w-full rounded-md border px-3 py-1 text-sm bg-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
-            state.field === 'name' ? 'border-destructive' : 'border-input'
-          }`}
+          className={state.field === 'name' ? 'border-destructive' : ''}
         />
       </div>
 
       <div>
-        <label htmlFor="body" className="block text-sm font-medium mb-1">
-          Release Notes
-        </label>
-        <textarea
+        <Label htmlFor="body">Release Notes</Label>
+        <Textarea
           id="body"
           name="body"
           rows={5}
           placeholder="What's new in this release..."
-          className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-y"
         />
       </div>
 
@@ -74,13 +64,9 @@ export default function CreateReleaseForm({ owner, repo }: { owner: string; repo
         <p className="text-sm text-destructive">{state.error}</p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={pending}>
         {pending ? 'Creating...' : 'Create Release'}
-      </button>
+      </Button>
     </form>
   )
 }

@@ -1,5 +1,7 @@
 'use client'
 
+import { Button } from '@forge-git/ui'
+
 export default function RepositoriesError({
   error,
   reset,
@@ -12,12 +14,9 @@ export default function RepositoriesError({
       <div className="border border-destructive/30 rounded-lg p-8 text-center">
         <p className="text-sm text-destructive mb-1">Something went wrong</p>
         <p className="text-xs text-muted-foreground mb-4">{error.message}</p>
-        <button
-          onClick={reset}
-          className="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90"
-        >
+        <Button onClick={reset}>
           Try again
-        </button>
+        </Button>
       </div>
     </main>
   )

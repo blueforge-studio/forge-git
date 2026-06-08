@@ -2,6 +2,7 @@ import { getSession } from '@/lib/session'
 import { listPullRequests } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Button } from '@forge-git/ui'
 import RepoSettingsNav from '@/components/repo-settings-nav'
 import { GitPullRequest } from 'lucide-react'
 
@@ -41,12 +42,11 @@ export default async function PullRequestsPage({ params, searchParams }: Props) 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Pull Requests</h2>
         <div className="flex items-center gap-2">
-          <Link
-            href={`/repositories/${owner}/${repo}/pulls/new`}
-            className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:opacity-90"
-          >
-            New Pull Request
-          </Link>
+          <Button asChild size="sm">
+            <Link href={`/repositories/${owner}/${repo}/pulls/new`}>
+              New Pull Request
+            </Link>
+          </Button>
           <div className="flex items-center gap-1 text-sm">
           {(['open', 'closed'] as const).map((s) => (
             <Link

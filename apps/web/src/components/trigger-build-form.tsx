@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import type { BuildJobData } from '@/lib/queue'
+import { Button, Input } from '@forge-git/ui'
 
 interface Props {
   onTriggered?: () => void
@@ -67,39 +68,34 @@ export default function TriggerBuildForm({ onTriggered, prefill }: Props) {
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-2 p-4">
       <div className="grid gap-2 sm:grid-cols-2">
-        <input
+        <Input
           name="repoId"
           type="text"
           placeholder="repoId *"
           required
-          className="flex h-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
-        <input
+        <Input
           name="orgId"
           type="text"
           placeholder="orgId *"
           required
-          className="flex h-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
-        <input
+        <Input
           name="commitSha"
           type="text"
           placeholder="commitSha *"
           required
-          className="flex h-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
-        <input
+        <Input
           name="branch"
           type="text"
           placeholder="branch *"
           required
-          className="flex h-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
-        <input
+        <Input
           name="prNumber"
           type="number"
           placeholder="PR number (optional)"
-          className="flex h-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
 
@@ -113,13 +109,9 @@ export default function TriggerBuildForm({ onTriggered, prefill }: Props) {
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="inline-flex items-center h-8 px-3 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={loading} size="sm">
         {loading ? 'Triggering...' : 'Trigger Build'}
-      </button>
+      </Button>
     </form>
   )
 }

@@ -1,5 +1,7 @@
 'use client'
 
+import { Button } from '@forge-git/ui'
+
 export default function RootError({
   error,
   reset,
@@ -12,12 +14,9 @@ export default function RootError({
       <h1 className="text-4xl font-bold text-muted-foreground/30 mb-4">500</h1>
       <p className="text-lg font-medium mb-2">Something went wrong</p>
       <p className="text-sm text-muted-foreground mb-6">{error.message}</p>
-      <button
-        onClick={reset}
-        className="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90"
-      >
+      <Button onClick={reset}>
         Try again
-      </button>
+      </Button>
     </main>
   )
 }

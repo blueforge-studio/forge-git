@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Button } from '@forge-git/ui'
 import EmptyState from '@/components/empty-state'
 import FeatureGrid from '@/components/feature-grid'
 import RepoList from '@/components/repo-list'
@@ -19,12 +20,9 @@ export default async function HomePage() {
                 Manage your code repositories on {session.baseUrl}
               </p>
             </div>
-            <Link
-              href="/repositories/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90"
-            >
-              New Repository
-            </Link>
+            <Button asChild>
+              <Link href="/repositories/new">New Repository</Link>
+            </Button>
           </div>
           <RepoList session={session} />
         </>
@@ -36,13 +34,12 @@ export default async function HomePage() {
               Self-hosted Git platform with CI/CD, team management, and preview deployments.
             </p>
             <div className="mt-6">
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90"
-              >
-                <LogIn className="w-4 h-4" />
-                Sign in to get started
-              </Link>
+              <Button asChild size="lg">
+                <Link href="/login">
+                  <LogIn className="w-4 h-4" />
+                  Sign in to get started
+                </Link>
+              </Button>
             </div>
           </div>
 
