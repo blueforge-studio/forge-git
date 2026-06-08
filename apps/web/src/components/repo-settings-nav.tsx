@@ -6,6 +6,7 @@ const tabs = [
   { label: 'Overview', href: '' },
   { label: 'Pull Requests', href: '/pulls' },
   { label: 'Issues', href: '/issues' },
+  { label: 'Releases', href: '/releases' },
   { label: 'Webhooks', href: '/webhooks' },
   { label: 'Deploy Keys', href: '/deploy-keys' },
   { label: 'Branch Protection', href: '/branch-protection' },

@@ -40,7 +40,14 @@ export default async function PullRequestsPage({ params, searchParams }: Props) 
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Pull Requests</h2>
-        <div className="flex items-center gap-1 text-sm">
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/repositories/${owner}/${repo}/pulls/new`}
+            className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:opacity-90"
+          >
+            New Pull Request
+          </Link>
+          <div className="flex items-center gap-1 text-sm">
           {(['open', 'closed'] as const).map((s) => (
             <Link
               key={s}
@@ -54,6 +61,7 @@ export default async function PullRequestsPage({ params, searchParams }: Props) 
               {s === 'open' ? 'Open' : 'Closed'}
             </Link>
           ))}
+          </div>
         </div>
       </div>
 

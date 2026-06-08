@@ -1,7 +1,9 @@
 import { getSession } from '@/lib/session'
 import { getCurrentUser } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
-import { User, Mail, Shield, Calendar } from 'lucide-react'
+import { User, Mail, Shield, Calendar, Server, Key } from 'lucide-react'
+import EditProfileForm from './edit-profile-form'
+import SignOutForm from './sign-out-form'
 
 export default async function SettingsPage() {
   const session = await getSession()
@@ -22,6 +24,10 @@ export default async function SettingsPage() {
       </main>
     )
   }
+
+  const maskedToken = session.token
+    ? `${session.token.slice(0, 6)}...${session.token.slice(-4)}`
+    : ''
 
   return (
     <main className="max-w-2xl mx-auto px-6 py-10">
@@ -44,7 +50,7 @@ export default async function SettingsPage() {
             </div>
           </div>
 
-          <dl className="space-y-3">
+          <dl className="space-y-3 mb-6">
             {user.email && (
               <div className="flex items-center gap-3 text-sm">
                 <Mail className="w-4 h-4 text-muted-foreground" />
@@ -72,13 +78,41 @@ export default async function SettingsPage() {
           </dl>
         </div>
 
+        {/* Edit profile */}
+        <div className="border border-border rounded-lg p-6">
+          <h3 className="text-sm font-semibold mb-4">Edit Profile</h3>
+          <EditProfileForm
+            defaults={{
+              full_name: user.full_name,
+              email: user.email,
+            }}
+          />
+        </div>
+
         {/* Connection info */}
         <div className="border border-border rounded-lg p-6">
           <h3 className="text-sm font-semibold mb-3">Connection</h3>
-          <div className="flex items-center gap-3 text-sm">
-            <dt className="text-muted-foreground">Gitea instance</dt>
-            <dd className="font-mono text-xs">{session.baseUrl}</dd>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-sm">
+              <Server className="w-4 h-4 text-muted-foreground" />
+              <dt className="text-muted-foreground w-24">Gitea URL</dt>
+              <dd className="font-mono text-xs">{session.baseUrl}</dd>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <Key className="w-4 h-4 text-muted-foreground" />
+              <dt className="text-muted-foreground w-24">Token</dt>
+              <dd className="font-mono text-xs">{maskedToken}</dd>
+            </div>
           </div>
+        </div>
+
+        {/* Sign out */}
+        <div className="border border-border rounded-lg p-6">
+          <h3 className="text-sm font-semibold mb-3">Session</h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Sign out to disconnect from this Gitea instance.
+          </p>
+          <SignOutForm />
         </div>
       </div>
     </main>
