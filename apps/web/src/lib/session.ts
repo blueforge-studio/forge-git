@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 const SESSION_COOKIE = 'forge-git-session'
 
 export interface Session {
-  giteaUrl: string
+  baseUrl: string
   token: string
 }
 
@@ -19,11 +19,11 @@ export async function getSession(): Promise<Session | null> {
 }
 
 export async function createSession(
-  giteaUrl: string,
+  baseUrl: string,
   token: string
 ): Promise<void> {
   const cookieStore = await cookies()
-  const value = btoa(JSON.stringify({ giteaUrl, token }))
+  const value = btoa(JSON.stringify({ baseUrl, token }))
   cookieStore.set(SESSION_COOKIE, value, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

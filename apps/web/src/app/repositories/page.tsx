@@ -13,7 +13,7 @@ export default async function RepositoriesPage() {
         <div>
           <h1 className="text-2xl font-semibold">Repositories</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Your repositories on {session.giteaUrl}
+            Your repositories on {session.baseUrl}
           </p>
         </div>
         <Link

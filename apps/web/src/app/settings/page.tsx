@@ -77,7 +77,7 @@ export default async function SettingsPage() {
           <h3 className="text-sm font-semibold mb-3">Connection</h3>
           <div className="flex items-center gap-3 text-sm">
             <dt className="text-muted-foreground">Gitea instance</dt>
-            <dd className="font-mono text-xs">{session.giteaUrl}</dd>
+            <dd className="font-mono text-xs">{session.baseUrl}</dd>
           </div>
         </div>
       </div>
