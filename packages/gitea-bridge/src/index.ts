@@ -448,6 +448,16 @@ export async function updatePullRequest(
   })
 }
 
+export async function mergePullRequest(
+  owner: string, repo: string, index: number,
+  opts?: GiteaOpts
+): Promise<void> {
+  return request<void>(`/repos/${owner}/${repo}/pulls/${index}/merge`, {
+    init: { method: 'POST' },
+    ...opts,
+  })
+}
+
 // ─── Issues ───────────────────────────────────────────────────────────────────
 
 export interface Issue {

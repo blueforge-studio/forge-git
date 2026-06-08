@@ -3,6 +3,7 @@ import { getIssue } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import RepoSettingsNav from '@/components/repo-settings-nav'
+import IssueActions from './issue-actions'
 
 interface Props {
   params: Promise<{ owner: string; repo: string; number: string }>
@@ -57,9 +58,15 @@ export default async function IssueDetailPage({ params }: Props) {
                 {issue.state}
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mb-3">
               #{issue.number} opened {new Date(issue.created_at).toLocaleDateString()} &mdash; {issue.comments} comments
             </p>
+            <IssueActions
+              owner={owner}
+              repo={repo}
+              issueNumber={issueNumber}
+              state={issue.state}
+            />
           </div>
         </div>
 

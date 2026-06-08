@@ -10,6 +10,8 @@ const tabs = [
   { label: 'Webhooks', href: '/webhooks' },
   { label: 'Deploy Keys', href: '/deploy-keys' },
   { label: 'Branch Protection', href: '/branch-protection' },
+  { label: 'Branches', href: '/branches' },
+  { label: 'Commits', href: '/commits' },
 ]
 
 export default function RepoSettingsNav({

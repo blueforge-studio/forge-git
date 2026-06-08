@@ -3,6 +3,7 @@ import { getPullRequest } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import RepoSettingsNav from '@/components/repo-settings-nav'
+import PullRequestActions from './pr-actions'
 import { GitPullRequest, GitMerge } from 'lucide-react'
 
 interface Props {
@@ -60,9 +61,16 @@ export default async function PullRequestDetailPage({ params }: Props) {
                 {pr.merged ? 'Merged' : pr.state}
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mb-3">
               #{pr.number} opened {new Date(pr.created_at).toLocaleDateString()} &mdash; {pr.comments} comments
             </p>
+            <PullRequestActions
+              owner={owner}
+              repo={repo}
+              prNumber={prNumber}
+              state={pr.state}
+              merged={pr.merged}
+            />
           </div>
         </div>
 
