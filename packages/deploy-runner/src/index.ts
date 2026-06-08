@@ -3,6 +3,8 @@
  *
  * BullMQ worker that processes CI/CD build jobs.
  * Each job: { repoId, commitSha, branch, prNumber?, workflowYaml? }
+ *
+ * Call start() to begin processing. Call stop() for graceful shutdown.
  */
 
 import { Worker, Job } from 'bullmq'
@@ -19,8 +21,6 @@ interface BuildJob {
   prNumber?: number
   workflowYaml?: string
 }
-
-const redis = new Redis(REDIS_URL, { maxRetriesPerRequest: null })
 
 async function processBuild(job: Job<BuildJob>) {
   const { repoId, commitSha, branch, prNumber, workflowYaml } = job.data
@@ -86,26 +86,41 @@ function buildDefaultWorkflow(): ParsedWorkflow {
   }
 }
 
-const worker = new Worker<BuildJob>(
-  'deployments',
-  async (job) => processBuild(job),
-  {
-    connection: redis,
-    concurrency: CONCURRENCY,
-  }
-)
+let redis: Redis | null = null
+let worker: Worker<BuildJob> | null = null
 
-worker.on('completed', (job, result) => {
-  console.log(`[${job.id}] Completed:`, result)
-})
+export function start() {
+  redis = new Redis(REDIS_URL, { maxRetriesPerRequest: null })
 
-worker.on('failed', (job, err) => {
-  console.error(`[${job?.id}] Failed:`, err.message)
-})
+  worker = new Worker<BuildJob>(
+    'deployments',
+    async (job) => processBuild(job),
+    {
+      connection: redis,
+      concurrency: CONCURRENCY,
+    }
+  )
 
-console.log(`forge-git deploy-runner started (concurrency: ${CONCURRENCY})`)
+  worker.on('completed', (job, result) => {
+    console.log(`[${job.id}] Completed:`, result)
+  })
 
-process.on('SIGTERM', () => {
-  worker.close()
-  redis.quit()
-})
+  worker.on('failed', (job, err) => {
+    console.error(`[${job?.id}] Failed:`, err.message)
+  })
+
+  console.log(`forge-git deploy-runner started (concurrency: ${CONCURRENCY})`)
+}
+
+export async function stop() {
+  if (worker) await worker.close()
+  if (redis) redis.quit()
+}
+
+// Auto-start when run directly (not imported)
+const runningDirectly = process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'))
+if (runningDirectly) {
+  start()
+  process.on('SIGTERM', () => stop())
+  process.on('SIGINT', () => stop())
+}

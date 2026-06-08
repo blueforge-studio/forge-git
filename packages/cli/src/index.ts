@@ -217,8 +217,30 @@ const tokenCmd = new Command('token')
       .option('--container <container>', 'Gitea Docker container name', 'forge-git_forge-git_1')
       .option('--scopes <scopes>', 'Comma-separated scopes', 'write:repository,read:repository,read:user')
       .action(async (username, name, options) => {
-        const { execSync } = await import('child_process')
+        const unsafe = /[^a-zA-Z0-9._\-:]/
+        if (unsafe.test(options.host) || options.host.length > 255) {
+          console.error(chalk.red('Invalid host'))
+          process.exit(1)
+        }
+        if (unsafe.test(options.container)) {
+          console.error(chalk.red('Invalid container name'))
+          process.exit(1)
+        }
+        if (/[^a-zA-Z0-9_\-.]/.test(username)) {
+          console.error(chalk.red('Invalid username'))
+          process.exit(1)
+        }
+        if (/[^a-zA-Z0-9_\-.]/.test(name)) {
+          console.error(chalk.red('Invalid token name'))
+          process.exit(1)
+        }
         const scopesArg = options.scopes.split(',').map((s: string) => s.trim()).join(',')
+        if (/[^a-zA-Z0-9_:]/.test(scopesArg)) {
+          console.error(chalk.red('Invalid scopes'))
+          process.exit(1)
+        }
+
+        const { execSync } = await import('child_process')
         const cmd = `ssh root@${options.host} "docker exec -u git ${options.container} gitea admin user generate-access-token --username ${username} --token-name ${name} --scopes ${scopesArg}"`
 
         console.log(chalk.blue(`Generating token for ${username} on ${options.host}...`))

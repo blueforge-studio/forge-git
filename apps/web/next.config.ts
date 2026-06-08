@@ -1,9 +1,5 @@
 import type { NextConfig } from 'next'
 
-const nextConfig: NextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['@forge-git/gitea-bridge'],
-  },
-}
+const nextConfig: NextConfig = {}
 
 export default nextConfig

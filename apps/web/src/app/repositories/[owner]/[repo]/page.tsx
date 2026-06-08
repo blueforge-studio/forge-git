@@ -3,10 +3,12 @@ import { getRepo } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
-  GitFork, Star, Eye, Lock, Globe, Clock,
-  AlertCircle, GitPullRequest, Copy, Check
+  GitFork, Star, Eye, Clock,
+  AlertCircle, GitPullRequest, Play
 } from 'lucide-react'
 import { CopyButton } from './copy-button'
+import RepoSettingsNav from '@/components/repo-settings-nav'
+import TriggerBuildForm from '@/components/trigger-build-form'
 
 interface Props {
   params: Promise<{ owner: string; repo: string }>
@@ -36,13 +38,15 @@ export default async function RepoDetailPage({ params }: Props) {
   return (
     <main className="max-w-4xl mx-auto px-6 py-10">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
         <Link href="/repositories" className="hover:text-foreground">Repositories</Link>
         <span>/</span>
         <Link href={`/repositories/${owner}`} className="hover:text-foreground">{owner}</Link>
         <span>/</span>
         <span className="text-foreground font-medium">{repoName}</span>
       </div>
+
+      <RepoSettingsNav owner={owner} repo={repoName} activeTab="overview" />
 
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
@@ -106,7 +110,7 @@ export default async function RepoDetailPage({ params }: Props) {
       </div>
 
       {/* Details grid */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 mb-6">
         <div className="border border-border rounded-lg p-4">
           <dt className="text-xs text-muted-foreground mb-1">Default Branch</dt>
           <dd className="text-sm font-mono">{repo.default_branch}</dd>
@@ -129,6 +133,17 @@ export default async function RepoDetailPage({ params }: Props) {
             {new Date(repo.pushed_at).toLocaleDateString()}
           </dd>
         </div>
+      </div>
+
+      {/* Build actions */}
+      <div className="border border-border rounded-lg">
+        <details>
+          <summary className="px-4 py-3 text-sm font-medium cursor-pointer hover:bg-secondary/30 flex items-center gap-2">
+            <Play className="w-4 h-4" />
+            Trigger Build
+          </summary>
+          <TriggerBuildForm />
+        </details>
       </div>
     </main>
   )

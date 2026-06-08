@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getSession } from '@/lib/session'
 import { getCurrentUser } from '@forge-git/gitea-bridge'
 import SignOutButton from './sign-out-button'
+import ThemeToggle from './theme-toggle'
 
 export default async function Header() {
   const session = await getSession()
@@ -53,6 +54,7 @@ export default async function Header() {
                   {user.login}
                 </span>
               )}
+              <ThemeToggle />
               <SignOutButton />
             </>
           ) : (
