@@ -23,24 +23,6 @@ services:
     depends_on:
       - redis
 
-  forge-git-api:
-    build:
-      context: ./apps/api
-      dockerfile: Dockerfile
-    container_name: forge-git-api
-    restart: unless-stopped
-    ports:
-      - "3002:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgres://forge-git:forge-git@postgres:5432/forge-git
-      - REDIS_URL=redis://redis:6379
-      - GITEA_URL=http://gitea:3000
-      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
-    depends_on:
-      - postgres
-      - redis
-
   deploy-runner:
     build:
       context: ./apps/deploy-runner
