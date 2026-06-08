@@ -4,7 +4,7 @@ import { useActionState } from 'react'
 import { createRepoAction } from '@/app/repositories/actions'
 
 export default function CreateRepoForm() {
-  const [state, formAction, pending] = useActionState(createRepoAction, {})
+  const [state, formAction, pending] = useActionState(createRepoAction, { error: '', field: '' })
 
   return (
     <form action={formAction} className="space-y-4">

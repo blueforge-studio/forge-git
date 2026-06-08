@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function createRepoAction(
-  prevState: { error?: string; field?: string },
+  prevState: { error: string; field: string },
   formData: FormData
 ) {
   const session = await getSession()
@@ -41,7 +41,7 @@ export async function createRepoAction(
     if (msg.includes('409')) {
       return { error: 'A repository with this name already exists', field: 'name' }
     }
-    return { error: `Failed to create repository: ${msg}` }
+    return { error: `Failed to create repository: ${msg}`, field: '' }
   }
 
   revalidatePath('/repositories')

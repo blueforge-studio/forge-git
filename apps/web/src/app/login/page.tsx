@@ -5,7 +5,7 @@ import { login } from './actions'
 import { Server } from 'lucide-react'
 
 export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(login, {})
+  const [state, formAction, pending] = useActionState(login, { error: '' })
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">

@@ -4,7 +4,7 @@ import { createSession } from '@/lib/session'
 import { getCurrentUser } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 
-export async function login(prevState: { error?: string }, formData: FormData) {
+export async function login(prevState: { error: string }, formData: FormData) {
   const giteaUrl = (formData.get('giteaUrl') as string).trim()
   const token = (formData.get('token') as string).trim()
 
