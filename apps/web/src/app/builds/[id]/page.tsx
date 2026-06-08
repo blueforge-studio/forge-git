@@ -3,34 +3,13 @@ import { redirect, notFound } from 'next/navigation'
 import { deploymentsQueue } from '@/lib/queue'
 import { Badge, Button } from '@forge-git/ui'
 import BuildLogViewer from '@/components/build-log-viewer'
+import JobTimestamps from '@/components/job-timestamps'
 import Link from 'next/link'
 import { retryJobAction, cancelJobAction } from './actions'
+import { stateBadgeVariant } from '@/lib/build-utils'
 
 interface Props {
   params: Promise<{ id: string }>
-}
-
-function relativeTime(timestamp: number): string {
-  const diff = Date.now() - timestamp
-  const seconds = Math.floor(diff / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
-  if (days > 0) return `${days}d ago`
-  if (hours > 0) return `${hours}h ago`
-  if (minutes > 0) return `${minutes}m ago`
-  return `${seconds}s ago`
-}
-
-function stateBadgeVariant(state: string): 'default' | 'secondary' | 'destructive' | 'success' | 'outline' {
-  switch (state) {
-    case 'active': return 'default'
-    case 'completed': return 'success'
-    case 'failed': return 'destructive'
-    case 'waiting':
-    case 'delayed': return 'secondary'
-    default: return 'outline'
-  }
 }
 
 export default async function BuildDetailPage({ params }: Props) {
@@ -126,35 +105,11 @@ export default async function BuildDetailPage({ params }: Props) {
           />
         )}
 
-        <div className="border border-border rounded-lg p-6">
-          <h2 className="text-sm font-semibold mb-2">Timestamps</h2>
-          <dl className="space-y-2 text-sm">
-            <div className="flex gap-2">
-              <dt className="text-muted-foreground w-28 shrink-0">Created</dt>
-              <dd>
-                {job.timestamp
-                  ? `${new Date(job.timestamp).toLocaleString()} (${relativeTime(job.timestamp)})`
-                  : '-'}
-              </dd>
-            </div>
-            <div className="flex gap-2">
-              <dt className="text-muted-foreground w-28 shrink-0">Processed</dt>
-              <dd>
-                {job.processedOn
-                  ? `${new Date(job.processedOn).toLocaleString()} (${relativeTime(job.processedOn)})`
-                  : '-'}
-              </dd>
-            </div>
-            <div className="flex gap-2">
-              <dt className="text-muted-foreground w-28 shrink-0">Finished</dt>
-              <dd>
-                {job.finishedOn
-                  ? `${new Date(job.finishedOn).toLocaleString()} (${relativeTime(job.finishedOn)})`
-                  : '-'}
-              </dd>
-            </div>
-          </dl>
-        </div>
+        <JobTimestamps
+          timestamp={job.timestamp}
+          processedOn={job.processedOn}
+          finishedOn={job.finishedOn}
+        />
 
         <div className="flex items-center gap-3 pt-2">
           {state === 'failed' && (

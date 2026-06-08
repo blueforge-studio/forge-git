@@ -2,17 +2,31 @@ import { getSession } from '@/lib/session'
 import { getRepo } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
-import {
-  GitFork, Star, Eye, Clock,
-  AlertCircle, GitPullRequest, Play, CheckCircle2, XCircle, Loader2
-} from 'lucide-react'
+import { Clock, Play } from 'lucide-react'
 import { deploymentsQueue } from '@/lib/queue'
-import { CopyButton } from './copy-button'
 import RepoSettingsNav from '@/components/repo-settings-nav'
 import TriggerBuildForm from '@/components/trigger-build-form'
+import BuildStatusBadge from '@/components/build-status-badge'
+import RepoStatsBar from '@/components/repo-stats-bar'
 
 interface Props {
   params: Promise<{ owner: string; repo: string }>
+}
+
+async function getBuildStatus(owner: string, repoName: string) {
+  try {
+    const repoId = `${owner}/${repoName}`
+    const [completed, failed, active] = await Promise.all([
+      deploymentsQueue.getJobs(['completed'], 0, 0),
+      deploymentsQueue.getJobs(['failed'], 0, 0),
+      deploymentsQueue.getJobs(['active'], 0, 0),
+    ])
+    const matchRepo = (j: { data: unknown }) => (j.data as { repoId?: string })?.repoId === repoId
+    if (active.some(matchRepo)) return { status: 'running' as const, latestBuildId: active.find(matchRepo)?.id as string | undefined }
+    if (failed.some(matchRepo)) return { status: 'failing' as const }
+    if (completed.some(matchRepo)) return { status: 'passing' as const }
+  } catch { /* Redis unavailable */ }
+  return { status: 'none' as const }
 }
 
 export default async function RepoDetailPage({ params }: Props) {
@@ -36,32 +50,10 @@ export default async function RepoDetailPage({ params }: Props) {
     )
   }
 
-  // Fetch latest build status for this repo (graceful degradation)
-  let buildStatus: 'none' | 'passing' | 'failing' | 'running' = 'none'
-  let latestBuildId: string | undefined
-  try {
-    const repoId = `${owner}/${repoName}`
-    const [completed, failed, active] = await Promise.all([
-      deploymentsQueue.getJobs(['completed'], 0, 0),
-      deploymentsQueue.getJobs(['failed'], 0, 0),
-      deploymentsQueue.getJobs(['active'], 0, 0),
-    ])
-    const matchRepo = (j: { data: unknown }) => (j.data as { repoId?: string })?.repoId === repoId
-    if (active.some(matchRepo)) {
-      buildStatus = 'running'
-      latestBuildId = active.find(matchRepo)?.id
-    } else if (failed.some(matchRepo)) {
-      buildStatus = 'failing'
-    } else if (completed.some(matchRepo)) {
-      buildStatus = 'passing'
-    }
-  } catch {
-    // Redis unavailable — skip build status
-  }
+  const { status: buildStatus } = await getBuildStatus(owner, repoName)
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-10">
-      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
         <Link href="/repositories" className="hover:text-foreground">Repositories</Link>
         <span>/</span>
@@ -94,22 +86,7 @@ export default async function RepoDetailPage({ params }: Props) {
                 Fork
               </span>
             )}
-            {buildStatus !== 'none' && (
-              <span className={`text-xs px-2 py-0.5 rounded-full border inline-flex items-center gap-1 ${
-                buildStatus === 'passing'
-                  ? 'border-green-500/30 text-green-600 bg-green-500/10'
-                  : buildStatus === 'failing'
-                    ? 'border-red-500/30 text-red-600 bg-red-500/10'
-                    : 'border-blue-500/30 text-blue-600 bg-blue-500/10'
-              }`}>
-                {buildStatus === 'passing' ? <CheckCircle2 className="w-3 h-3" />
-                  : buildStatus === 'failing' ? <XCircle className="w-3 h-3" />
-                  : <Loader2 className="w-3 h-3 animate-spin" />}
-                {buildStatus === 'passing' ? 'Build passing'
-                  : buildStatus === 'failing' ? 'Build failing'
-                  : 'Build running'}
-              </span>
-            )}
+            <BuildStatusBadge status={buildStatus} />
           </div>
           {repo.description && (
             <p className="text-sm text-muted-foreground">{repo.description}</p>
@@ -117,30 +94,14 @@ export default async function RepoDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Stats bar */}
-      <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6 pb-6 border-b border-border">
-        {repo.language && (
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full bg-primary" />
-            {repo.language}
-          </span>
-        )}
-        <span className="flex items-center gap-1">
-          <Star className="w-4 h-4" /> {repo.stars_count} stars
-        </span>
-        <span className="flex items-center gap-1">
-          <GitFork className="w-4 h-4" /> {repo.forks_count} forks
-        </span>
-        <span className="flex items-center gap-1">
-          <Eye className="w-4 h-4" /> {repo.watchers_count} watchers
-        </span>
-        <span className="flex items-center gap-1">
-          <AlertCircle className="w-4 h-4" /> {repo.open_issues_count} issues
-        </span>
-        <span className="flex items-center gap-1">
-          <GitPullRequest className="w-4 h-4" /> {repo.open_pr_counter} PRs
-        </span>
-      </div>
+      <RepoStatsBar
+        language={repo.language}
+        stars_count={repo.stars_count}
+        forks_count={repo.forks_count}
+        watchers_count={repo.watchers_count}
+        open_issues_count={repo.open_issues_count}
+        open_pr_counter={repo.open_pr_counter}
+      />
 
       {/* Clone URLs */}
       <div className="space-y-3 mb-6">
@@ -190,7 +151,6 @@ export default async function RepoDetailPage({ params }: Props) {
 }
 
 function CloneUrlRow({ label, url }: { label: string; url: string }) {
-  // This is a server component — we use a client component for the copy button
   return (
     <div className="flex items-center gap-3">
       <span className="text-xs text-muted-foreground w-12">{label}</span>
