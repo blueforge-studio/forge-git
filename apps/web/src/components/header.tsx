@@ -4,6 +4,8 @@ import { getSession } from '@/lib/session'
 import { getCurrentUser } from '@forge-git/gitea-bridge'
 import SignOutButton from './sign-out-button'
 import ThemeToggle from './theme-toggle'
+import SearchBar from './search-bar'
+import NotificationBell from './notification-bell'
 
 export default async function Header() {
   const session = await getSession()
@@ -39,9 +41,11 @@ export default async function Header() {
               <Link href="/builds" className="hover:text-primary">
                 Builds
               </Link>
+              <SearchBar />
               <Link href="/settings" className="hover:text-primary">
                 Settings
               </Link>
+              <NotificationBell />
               {user && (
                 <span className="flex items-center gap-2 text-muted-foreground">
                   {user.avatar_url && (

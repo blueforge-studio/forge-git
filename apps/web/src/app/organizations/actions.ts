@@ -1,7 +1,7 @@
 'use server'
 
 import { getSession } from '@/lib/session'
-import { createOrg, addOrgMember, removeOrgMember, createTeam } from '@forge-git/gitea-bridge'
+import { createOrg, addOrgMember, removeOrgMember, createTeam, updateOrg } from '@forge-git/gitea-bridge'
 import type { CreateOrgRequest } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
@@ -112,4 +112,42 @@ export async function createTeamAction(
 
   revalidatePath(`/organizations/${org}`)
   return { error: '', field: '' }
+}
+
+export async function editOrgAction(
+  prevState: { error: string; field: string },
+  formData: FormData
+) {
+  const session = await getSession()
+  if (!session) redirect('/login')
+
+  const org = (formData.get('org') as string).trim()
+  const full_name = (formData.get('full_name') as string).trim() || undefined
+  const description = (formData.get('description') as string).trim() || undefined
+  const website = (formData.get('website') as string).trim() || undefined
+  const location = (formData.get('location') as string).trim() || undefined
+  const visibility = (formData.get('visibility') as string) || undefined
+
+  if (!org) return { error: 'Organization name is required', field: 'org' }
+
+  try {
+    const data: {
+      full_name?: string; description?: string; website?: string
+      location?: string; visibility?: 'public' | 'limited' | 'private'
+    } = {}
+    if (full_name) data.full_name = full_name
+    if (description) data.description = description
+    if (website) data.website = website
+    if (location) data.location = location
+    if (visibility && ['public', 'limited', 'private'].includes(visibility)) {
+      data.visibility = visibility as 'public' | 'limited' | 'private'
+    }
+    await updateOrg(org, data, session)
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    return { error: `Failed to update organization: ${msg}`, field: '' }
+  }
+
+  revalidatePath(`/organizations/${org}`)
+  redirect(`/organizations/${org}`)
 }

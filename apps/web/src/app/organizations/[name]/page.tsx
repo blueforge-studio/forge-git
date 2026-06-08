@@ -6,7 +6,7 @@ import RepoCard from '@/components/repo-card'
 import AddMemberForm from '@/components/add-member-form'
 import CreateTeamForm from '@/components/create-team-form'
 import RemoveMemberButton from '@/components/remove-member-button'
-import { Users, Shield } from 'lucide-react'
+import { Users, Shield, Settings } from 'lucide-react'
 
 interface Props {
   params: Promise<{ name: string }>
@@ -40,16 +40,25 @@ export default async function OrgDetailPage({ params }: Props) {
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-10">
-      <div className="flex items-center gap-4 mb-8">
-        {org.avatar_url ? (
-          <img src={org.avatar_url} alt={org.name} className="w-12 h-12 rounded-full" />
-        ) : null}
-        <div>
-          <h1 className="text-2xl font-semibold">{org.full_name || org.name}</h1>
-          {org.description && (
-            <p className="text-sm text-muted-foreground mt-1">{org.description}</p>
-          )}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          {org.avatar_url ? (
+            <img src={org.avatar_url} alt={org.name} className="w-12 h-12 rounded-full" />
+          ) : null}
+          <div>
+            <h1 className="text-2xl font-semibold">{org.full_name || org.name}</h1>
+            {org.description && (
+              <p className="text-sm text-muted-foreground mt-1">{org.description}</p>
+            )}
+          </div>
         </div>
+        <Link
+          href={`/organizations/${org.name}/settings`}
+          className="text-muted-foreground hover:text-foreground transition-colors"
+          title="Organization settings"
+        >
+          <Settings className="w-5 h-5" />
+        </Link>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
@@ -80,7 +89,12 @@ export default async function OrgDetailPage({ params }: Props) {
               <div className="space-y-2">
                 {teams.map((team) => (
                   <div key={team.id} className="flex items-center justify-between text-sm">
-                    <span>{team.name}</span>
+                    <Link
+                      href={`/organizations/${org.name}/teams/${team.id}`}
+                      className="hover:text-primary hover:underline"
+                    >
+                      {team.name}
+                    </Link>
                     <span className="text-xs text-muted-foreground capitalize">{team.permission}</span>
                   </div>
                 ))}

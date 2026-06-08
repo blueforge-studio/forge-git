@@ -7,30 +7,32 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "next": "^16.2.4",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "@forge-git/ui": "workspace:*",
-    "@forge-git/gitea-bridge": "workspace:*",
     "@forge-git/deploy-runner": "workspace:*",
+    "@forge-git/gitea-bridge": "workspace:*",
+    "@forge-git/ui": "workspace:*",
     "bullmq": "^5.0.0",
     "ioredis": "^5.4.0",
-    "lucide-react": "^0.577.0"
+    "lucide-react": "^0.577.0",
+    "next": "^16.2.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.9.3",
-    "tailwindcss": "^4.2.2",
-    "@tailwindcss/postcss": "^4.2.2",
-    "vitest": "^3.0.0",
-    "@testing-library/react": "^16.0.0",
-    "@testing-library/jest-dom": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.0",
-    "jsdom": "^25.0.0"
+    "jsdom": "^25.0.0",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
   }
 }

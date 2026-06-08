@@ -599,3 +599,130 @@ export async function getCommit(
 ): Promise<Commit> {
   return request<Commit>(`/repos/${owner}/${repo}/commits/${encodeURIComponent(ref)}`, opts)
 }
+
+// ─── Search ─────────────────────────────────────────────────────────────────
+
+export interface SearchResult<T> {
+  ok: boolean
+  data: T[]
+}
+
+export async function searchRepos(
+  query: string, opts?: { page?: number; limit?: number } & GiteaOpts
+): Promise<SearchResult<GiteaRepo>> {
+  const qs = new URLSearchParams({ q: query })
+  if (opts?.page) qs.set('page', String(opts.page))
+  if (opts?.limit) qs.set('limit', String(opts.limit))
+  return request<SearchResult<GiteaRepo>>(`/repos/search?${qs}`, opts)
+}
+
+export async function searchIssues(
+  query: string, opts?: { page?: number; limit?: number; state?: 'open' | 'closed' } & GiteaOpts
+): Promise<{ ok: boolean; data: Issue[] }> {
+  const qs = new URLSearchParams({ q: query })
+  if (opts?.page) qs.set('page', String(opts.page))
+  if (opts?.limit) qs.set('limit', String(opts.limit))
+  if (opts?.state) qs.set('state', opts.state)
+  // Gitea issue search returns issues via /repos/issues/search
+  return request<{ ok: boolean; data: Issue[] }>(`/repos/issues/search?${qs}`, opts)
+}
+
+// ─── Notifications ──────────────────────────────────────────────────────────
+
+export interface Notification {
+  id: number
+  repository: { id: number; name: string; full_name: string; owner: { login: string } }
+  subject: { title: string; url: string; type: string; state: string }
+  unread: boolean
+  pinned: boolean
+  updated_at: string
+  created_at: string
+}
+
+export interface NotificationCount {
+  new: number
+}
+
+export async function listNotifications(
+  opts?: { unread?: boolean; page?: number; limit?: number } & GiteaOpts
+): Promise<Notification[]> {
+  const qs = new URLSearchParams()
+  if (opts?.unread !== undefined) qs.set('status-types', opts.unread ? 'unread' : 'read')
+  if (opts?.page) qs.set('page', String(opts.page))
+  if (opts?.limit) qs.set('limit', String(opts.limit))
+  const q = qs.toString()
+  return request<Notification[]>(`/notifications${q ? '?' + q : ''}`, opts)
+}
+
+export async function markNotificationRead(id: number, opts?: GiteaOpts): Promise<void> {
+  return request<void>(`/notifications/${id}`, {
+    init: { method: 'PATCH', body: JSON.stringify({ status: 'read' }) },
+    ...opts,
+  })
+}
+
+export async function markAllNotificationsRead(opts?: GiteaOpts): Promise<void> {
+  return request<void>('/notifications', {
+    init: { method: 'PUT', body: JSON.stringify({ status: 'read' }) },
+    ...opts,
+  })
+}
+
+// ─── Team Management (extended) ─────────────────────────────────────────────
+
+export async function getTeam(id: number, opts?: GiteaOpts): Promise<Team> {
+  return request<Team>(`/teams/${id}`, opts)
+}
+
+export async function deleteTeam(id: number, opts?: GiteaOpts): Promise<void> {
+  return request<void>(`/teams/${id}`, {
+    init: { method: 'DELETE' },
+    ...opts,
+  })
+}
+
+export async function updateTeam(
+  id: number,
+  data: { name?: string; description?: string; permission?: 'read' | 'write' | 'admin' },
+  opts?: GiteaOpts
+): Promise<Team> {
+  return request<Team>(`/teams/${id}`, {
+    init: { method: 'PATCH', body: JSON.stringify(data) },
+    ...opts,
+  })
+}
+
+export async function listTeamMembers(id: number, opts?: GiteaOpts): Promise<OrgMember[]> {
+  return request<OrgMember[]>(`/teams/${id}/members`, opts)
+}
+
+export async function addTeamMember(id: number, username: string, opts?: GiteaOpts): Promise<void> {
+  return request<void>(`/teams/${id}/members/${username}`, {
+    init: { method: 'PUT' },
+    ...opts,
+  })
+}
+
+export async function removeTeamMember(id: number, username: string, opts?: GiteaOpts): Promise<void> {
+  return request<void>(`/teams/${id}/members/${username}`, {
+    init: { method: 'DELETE' },
+    ...opts,
+  })
+}
+
+export async function listTeamRepos(id: number, opts?: GiteaOpts): Promise<GiteaRepo[]> {
+  return request<GiteaRepo[]>(`/teams/${id}/repos`, opts)
+}
+
+// ─── Organization Management (extended) ─────────────────────────────────────
+
+export async function updateOrg(
+  org: string,
+  data: { full_name?: string; description?: string; website?: string; location?: string; visibility?: 'public' | 'limited' | 'private' },
+  opts?: GiteaOpts
+): Promise<GiteaOrg> {
+  return request<GiteaOrg>(`/orgs/${org}`, {
+    init: { method: 'PATCH', body: JSON.stringify(data) },
+    ...opts,
+  })
+}

@@ -1,24 +1,36 @@
 import { getSession } from '@/lib/session'
 import { redirect, notFound } from 'next/navigation'
 import { deploymentsQueue } from '@/lib/queue'
+import { Badge, Button } from '@forge-git/ui'
+import BuildLogViewer from '@/components/build-log-viewer'
+import Link from 'next/link'
+import { retryJobAction, cancelJobAction } from './actions'
 
 interface Props {
   params: Promise<{ id: string }>
 }
 
-function statusBadge(state: string) {
-  const colors: Record<string, string> = {
-    completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    failed: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-    active: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    waiting: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-    delayed: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+function relativeTime(timestamp: number): string {
+  const diff = Date.now() - timestamp
+  const seconds = Math.floor(diff / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  if (days > 0) return `${days}d ago`
+  if (hours > 0) return `${hours}h ago`
+  if (minutes > 0) return `${minutes}m ago`
+  return `${seconds}s ago`
+}
+
+function stateBadgeVariant(state: string): 'default' | 'secondary' | 'destructive' | 'success' | 'outline' {
+  switch (state) {
+    case 'active': return 'default'
+    case 'completed': return 'success'
+    case 'failed': return 'destructive'
+    case 'waiting':
+    case 'delayed': return 'secondary'
+    default: return 'outline'
   }
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${colors[state] || colors.waiting}`}>
-      {state}
-    </span>
-  )
 }
 
 export default async function BuildDetailPage({ params }: Props) {
@@ -49,32 +61,43 @@ export default async function BuildDetailPage({ params }: Props) {
   const failedReason = job.failedReason
   const data = job.data as Record<string, unknown>
 
+  const logsToShow = result
+    ? typeof result === 'string' ? result : JSON.stringify(result, null, 2)
+    : failedReason || undefined
+
   return (
     <main className="max-w-2xl mx-auto px-6 py-10">
       <div className="space-y-6">
+        <Link
+          href="/builds"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          &larr; Back to builds
+        </Link>
+
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-semibold font-mono">#{job.id}</h1>
-          {statusBadge(state)}
+          <Badge variant={stateBadgeVariant(state)}>{state}</Badge>
         </div>
 
         <div className="border border-border rounded-lg p-6 space-y-3">
           <h2 className="text-sm font-semibold">Job Data</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex gap-2">
-              <dt className="text-muted-foreground w-24">Repo</dt>
+              <dt className="text-muted-foreground w-24 shrink-0">Repo</dt>
               <dd className="font-mono">{String(data.repoId || '-')}</dd>
             </div>
             <div className="flex gap-2">
-              <dt className="text-muted-foreground w-24">Branch</dt>
+              <dt className="text-muted-foreground w-24 shrink-0">Branch</dt>
               <dd className="font-mono">{String(data.branch || '-')}</dd>
             </div>
             <div className="flex gap-2">
-              <dt className="text-muted-foreground w-24">Commit</dt>
+              <dt className="text-muted-foreground w-24 shrink-0">Commit</dt>
               <dd className="font-mono text-xs">{String(data.commitSha || '-')}</dd>
             </div>
             {data.prNumber ? (
               <div className="flex gap-2">
-                <dt className="text-muted-foreground w-24">PR</dt>
+                <dt className="text-muted-foreground w-24 shrink-0">PR</dt>
                 <dd>#{String(data.prNumber)}</dd>
               </div>
             ) : null}
@@ -96,38 +119,54 @@ export default async function BuildDetailPage({ params }: Props) {
           </div>
         )}
 
-        {state === 'completed' && result && (
-          <div className="border border-border rounded-lg p-6">
-            <h2 className="text-sm font-semibold mb-2">Result</h2>
-            <pre className="text-xs bg-secondary/50 rounded-md p-3 overflow-auto">
-              {JSON.stringify(result, null, 2)}
-            </pre>
-          </div>
-        )}
-
-        {state === 'failed' && failedReason && (
-          <div className="border border-destructive/30 rounded-lg p-6">
-            <h2 className="text-sm font-semibold mb-2 text-destructive">Error</h2>
-            <pre className="text-xs text-destructive/80 whitespace-pre-wrap">{failedReason}</pre>
-          </div>
+        {logsToShow && (
+          <BuildLogViewer
+            logs={logsToShow}
+            title={state === 'failed' ? 'Error' : 'Result'}
+          />
         )}
 
         <div className="border border-border rounded-lg p-6">
           <h2 className="text-sm font-semibold mb-2">Timestamps</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex gap-2">
-              <dt className="text-muted-foreground w-28">Created</dt>
-              <dd>{job.timestamp ? new Date(job.timestamp).toLocaleString() : '-'}</dd>
+              <dt className="text-muted-foreground w-28 shrink-0">Created</dt>
+              <dd>
+                {job.timestamp
+                  ? `${new Date(job.timestamp).toLocaleString()} (${relativeTime(job.timestamp)})`
+                  : '-'}
+              </dd>
             </div>
             <div className="flex gap-2">
-              <dt className="text-muted-foreground w-28">Processed</dt>
-              <dd>{job.processedOn ? new Date(job.processedOn).toLocaleString() : '-'}</dd>
+              <dt className="text-muted-foreground w-28 shrink-0">Processed</dt>
+              <dd>
+                {job.processedOn
+                  ? `${new Date(job.processedOn).toLocaleString()} (${relativeTime(job.processedOn)})`
+                  : '-'}
+              </dd>
             </div>
             <div className="flex gap-2">
-              <dt className="text-muted-foreground w-28">Finished</dt>
-              <dd>{job.finishedOn ? new Date(job.finishedOn).toLocaleString() : '-'}</dd>
+              <dt className="text-muted-foreground w-28 shrink-0">Finished</dt>
+              <dd>
+                {job.finishedOn
+                  ? `${new Date(job.finishedOn).toLocaleString()} (${relativeTime(job.finishedOn)})`
+                  : '-'}
+              </dd>
             </div>
           </dl>
+        </div>
+
+        <div className="flex items-center gap-3 pt-2">
+          {state === 'failed' && (
+            <form action={retryJobAction.bind(null, id)}>
+              <Button type="submit" variant="outline" size="sm">Retry Build</Button>
+            </form>
+          )}
+          {(state === 'active' || state === 'waiting') && (
+            <form action={cancelJobAction.bind(null, id)}>
+              <Button type="submit" variant="destructive" size="sm">Cancel Build</Button>
+            </form>
+          )}
         </div>
       </div>
     </main>
