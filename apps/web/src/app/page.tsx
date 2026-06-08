@@ -1,5 +1,6 @@
 import { Server } from 'lucide-react'
 import Link from 'next/link'
+import EmptyState from '@/components/empty-state'
 
 export default function HomePage() {
   return (
@@ -34,18 +35,13 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* Empty state */}
-        <div className="border border-dashed border-border rounded-lg p-12 text-center">
-          <Server className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-          <h2 className="text-lg font-medium mb-1">No repositories yet</h2>
-          <p className="text-sm text-muted-foreground mb-4">Create your first repository to start hosting with forge-git</p>
-          <Link
-            href="/repositories/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90"
-          >
-            Create Repository
-          </Link>
-        </div>
+        <EmptyState
+          icon={Server}
+          title="No repositories yet"
+          description="Create your first repository to start hosting with forge-git"
+          actionLabel="Create Repository"
+          actionHref="/repositories/new"
+        />
       </main>
     </div>
   )
