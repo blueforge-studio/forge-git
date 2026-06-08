@@ -3,7 +3,7 @@ import { listOrgs } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import EmptyState from '@/components/empty-state'
-import { Building2 } from 'lucide-react'
+import { Building2, Plus } from 'lucide-react'
 
 export default async function OrganizationsPage() {
   const session = await getSession()
@@ -27,10 +27,21 @@ export default async function OrganizationsPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-10">
-      <h1 className="text-2xl font-semibold mb-1">Organizations</h1>
-      <p className="text-sm text-muted-foreground mb-6">
-        Organizations you belong to on {session.baseUrl}
-      </p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-semibold">Organizations</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Organizations you belong to on {session.baseUrl}
+          </p>
+        </div>
+        <Link
+          href="/organizations/new"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90"
+        >
+          <Plus className="w-4 h-4" />
+          New Organization
+        </Link>
+      </div>
 
       {orgs.length === 0 ? (
         <EmptyState

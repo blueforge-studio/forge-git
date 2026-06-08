@@ -3,6 +3,9 @@ import { getOrg, listOrgMembers, listOrgTeams, listOrgRepos } from '@forge-git/g
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import RepoCard from '@/components/repo-card'
+import AddMemberForm from '@/components/add-member-form'
+import CreateTeamForm from '@/components/create-team-form'
+import RemoveMemberButton from '@/components/remove-member-button'
 import { Users, Shield } from 'lucide-react'
 
 interface Props {
@@ -83,6 +86,7 @@ export default async function OrgDetailPage({ params }: Props) {
                 ))}
               </div>
             )}
+            <CreateTeamForm org={org.name} />
           </div>
 
           {/* Members */}
@@ -92,16 +96,20 @@ export default async function OrgDetailPage({ params }: Props) {
             </h2>
             <div className="space-y-2">
               {members.map((member) => (
-                <div key={member.id} className="flex items-center gap-2 text-sm">
-                  {member.avatar_url ? (
-                    <img src={member.avatar_url} alt={member.login} className="w-5 h-5 rounded-full" />
-                  ) : (
-                    <div className="w-5 h-5 rounded-full bg-secondary" />
-                  )}
-                  <span>{member.full_name || member.login}</span>
+                <div key={member.id} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    {member.avatar_url ? (
+                      <img src={member.avatar_url} alt={member.login} className="w-5 h-5 rounded-full" />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-secondary" />
+                    )}
+                    <span>{member.full_name || member.login}</span>
+                  </div>
+                  <RemoveMemberButton org={org.name} username={member.login} />
                 </div>
               ))}
             </div>
+            <AddMemberForm org={org.name} />
           </div>
         </div>
       </div>

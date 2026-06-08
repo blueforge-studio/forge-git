@@ -23,6 +23,12 @@ importers:
       '@forge-git/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      bullmq:
+        specifier: ^5.0.0
+        version: 5.76.2
+      ioredis:
+        specifier: ^5.4.0
+        version: 5.10.1
       lucide-react:
         specifier: ^0.577.0
         version: 0.577.0(react@19.2.5)

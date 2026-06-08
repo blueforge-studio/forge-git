@@ -1,0 +1,115 @@
+'use server'
+
+import { getSession } from '@/lib/session'
+import { createOrg, addOrgMember, removeOrgMember, createTeam } from '@forge-git/gitea-bridge'
+import type { CreateOrgRequest } from '@forge-git/gitea-bridge'
+import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
+
+export async function createOrgAction(
+  prevState: { error: string; field: string },
+  formData: FormData
+) {
+  const session = await getSession()
+  if (!session) redirect('/login')
+
+  const name = (formData.get('name') as string).trim()
+  const full_name = (formData.get('full_name') as string).trim() || undefined
+  const description = (formData.get('description') as string).trim() || undefined
+  const visibility = (formData.get('visibility') as string) || undefined
+
+  if (!name) return { error: 'Organization name is required', field: 'name' }
+  if (!/^[a-zA-Z0-9._-]+$/.test(name)) {
+    return { error: 'Name can only contain letters, numbers, dots, hyphens, and underscores', field: 'name' }
+  }
+
+  try {
+    const data: CreateOrgRequest = { name, full_name, description }
+    if (visibility) data.visibility = visibility as 'public' | 'limited' | 'private'
+    await createOrg(data, session)
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    if (msg.includes('409')) {
+      return { error: 'An organization with this name already exists', field: 'name' }
+    }
+    return { error: `Failed to create organization: ${msg}`, field: '' }
+  }
+
+  revalidatePath('/organizations')
+  redirect('/organizations')
+}
+
+export async function addMemberAction(
+  prevState: { error: string; field: string },
+  formData: FormData
+) {
+  const session = await getSession()
+  if (!session) redirect('/login')
+
+  const org = (formData.get('org') as string).trim()
+  const username = (formData.get('username') as string).trim()
+
+  if (!username) return { error: 'Username is required', field: 'username' }
+
+  try {
+    await addOrgMember(org, username, session)
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    if (msg.includes('404')) {
+      return { error: `User "${username}" not found`, field: 'username' }
+    }
+    return { error: `Failed to add member: ${msg}`, field: '' }
+  }
+
+  revalidatePath(`/organizations/${org}`)
+  return { error: '', field: '' }
+}
+
+export async function removeMemberAction(
+  prevState: { error: string; field: string },
+  formData: FormData
+) {
+  const session = await getSession()
+  if (!session) redirect('/login')
+
+  const org = (formData.get('org') as string).trim()
+  const username = (formData.get('username') as string).trim()
+
+  try {
+    await removeOrgMember(org, username, session)
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    return { error: `Failed to remove member: ${msg}`, field: '' }
+  }
+
+  revalidatePath(`/organizations/${org}`)
+  return { error: '', field: '' }
+}
+
+export async function createTeamAction(
+  prevState: { error: string; field: string },
+  formData: FormData
+) {
+  const session = await getSession()
+  if (!session) redirect('/login')
+
+  const org = (formData.get('org') as string).trim()
+  const name = (formData.get('name') as string).trim()
+  const description = (formData.get('description') as string).trim() || undefined
+  const permission = (formData.get('permission') as string) || 'read'
+
+  if (!name) return { error: 'Team name is required', field: 'name' }
+
+  try {
+    await createTeam(org, { name, description, permission: permission as 'read' | 'write' | 'admin' }, session)
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    if (msg.includes('409')) {
+      return { error: 'A team with this name already exists', field: 'name' }
+    }
+    return { error: `Failed to create team: ${msg}`, field: '' }
+  }
+
+  revalidatePath(`/organizations/${org}`)
+  return { error: '', field: '' }
+}

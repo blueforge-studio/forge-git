@@ -35,6 +35,9 @@ export default async function Header() {
               <Link href="/organizations" className="hover:text-primary">
                 Organizations
               </Link>
+              <Link href="/builds" className="hover:text-primary">
+                Builds
+              </Link>
               <Link href="/settings" className="hover:text-primary">
                 Settings
               </Link>
