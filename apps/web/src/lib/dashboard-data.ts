@@ -74,7 +74,7 @@ export async function fetchDashboardData(
     repoCount: repos.length,
     prCount: pulls.filter((p) => p.state === 'open').length,
     issueCount: issues.filter((i) => i.state === 'open').length,
-    buildCount: builds.length,
+    buildCount: builds.filter((b) => b.state === 'active' || b.state === 'waiting').length,
   }
 }
 
