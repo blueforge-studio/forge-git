@@ -17,8 +17,14 @@ test.describe('Search page', () => {
 })
 
 test.describe('Notifications page', () => {
-  test('notifications page redirects when unauthenticated', async ({ page }) => {
+  test('redirects when unauthenticated', async ({ page }) => {
     await page.goto('/notifications')
+    await page.waitForURL('**/login**')
+    expect(page.url()).toContain('/login')
+  })
+
+  test('redirects with type filter when unauthenticated', async ({ page }) => {
+    await page.goto('/notifications?type=Issue')
     await page.waitForURL('**/login**')
     expect(page.url()).toContain('/login')
   })
