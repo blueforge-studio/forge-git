@@ -1,36 +1,62 @@
+# Development override for docker-compose.yml
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#
+# This overlay:
+#   - Adds health checks for infra services
+#   - Exposes Gitea on port 3001 for local Next.js dev
+#   - Disables deploy-runner (run locally with pnpm --filter @forge-git/deploy-runner dev)
+#   - Configures MinIO to auto-create the build artifacts bucket
+#
+# Then run the web app locally:
+#   pnpm dev
+
 services:
-  web:
-    image: node:22-alpine
-    container_name: forge-git-web
-    working_dir: /app
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./apps/web:/app/apps/web
-      - ./packages:/app/packages
-      - ./pnpm-workspace.yaml:/app/pnpm-workspace.yaml
-      - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
-      - ./package.json:/app/package.json
-      - ./tsconfig.json:/app/tsconfig.json
-      - /app/node_modules
-    command: >
+  gitea:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/v1/version"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  redis:
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres:
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "forge-git"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  minio:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # MinIO bucket provisioning — creates the forge-git-builds bucket on startup
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
       sh -c "
-        npm install -g pnpm &&
-        pnpm -C apps/web dev
+        mc alias set local http://minio:9000 $${MINIO_ROOT_USER:-minioadmin} $${MINIO_ROOT_PASSWORD:-minioadmin};
+        mc mb --ignore-existing local/forge-git-builds;
+        echo 'MinIO bucket forge-git-builds ready'
       "
     environment:
-      - GITEA_URL=http://gitea:3000
-      - REDIS_HOST=redis
-      - DATABASE_URL=postgres://forge-git:forge-git@postgres:5432/forge-git?schema=public
-    depends_on:
-      gitea:
-        condition: service_started
-      redis:
-        condition: service_started
-      postgres:
-        condition: service_started
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY:-minioadmin}
 
-networks:
-  default:
-    name: forge-git-network
-    driver: bridge
+  deploy-runner:
+    profiles:
+      - full

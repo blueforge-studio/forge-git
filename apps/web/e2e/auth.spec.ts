@@ -12,13 +12,30 @@ test.describe('Unauthenticated pages', () => {
   test('login page renders the sign in form', async ({ page }) => {
     await page.goto('/login')
     await expect(page.locator('text=Sign in to forge-git')).toBeVisible()
-    await expect(page.locator('input[name="giteaUrl"]')).toBeVisible()
-    await expect(page.locator('input[name="token"]')).toBeVisible()
-    await expect(page.locator('button[type="submit"]')).toBeVisible()
+    await expect(page.locator('text=Sign in with Gitea')).toBeVisible()
+    await expect(page.locator('text=Manual token')).toBeVisible()
   })
 
-  test('login page shows error with empty fields', async ({ page }) => {
+  test('login page PAT form is behind details toggle', async ({ page }) => {
     await page.goto('/login')
+    const details = page.locator('details')
+    // PAT inputs not visible until expanded
+    await expect(details.locator('input[name="giteaUrl"]')).not.toBeVisible()
+    // Expand the details
+    await details.locator('summary').click()
+    await expect(page.locator('input[name="giteaUrl"]')).toBeVisible()
+    await expect(page.locator('input[name="token"]')).toBeVisible()
+  })
+
+  test('login page shows OAuth setup instructions', async ({ page }) => {
+    await page.goto('/login')
+    await expect(page.locator('text=Setting up OAuth')).toBeVisible()
+  })
+
+  test('PAT form shows error with empty fields', async ({ page }) => {
+    await page.goto('/login')
+    // Expand PAT details section
+    await page.locator('details summary').click()
     await page.locator('button[type="submit"]').click()
     await expect(page.locator('text=Gitea URL is required')).toBeVisible()
   })

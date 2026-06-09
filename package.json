@@ -5,8 +5,10 @@
   "packageManager": "pnpm@9.0.0",
   "scripts": {
     "dev": "pnpm --filter @forge-git/web dev",
-    "infra:up": "docker compose up -d",
-    "infra:down": "docker compose down",
+    "dev:full": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d && pnpm dev",
+    "infra:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
+    "infra:up:full": "docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile full up -d",
+    "infra:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
     "test": "turbo run test",
     "build": "turbo run build"
   },
