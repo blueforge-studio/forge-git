@@ -13,3 +13,15 @@ test.describe('Builds pages', () => {
     expect(page.url()).toContain('/login')
   })
 })
+
+test.describe('Build log APIs', () => {
+  test('log SSE stream requires authentication', async ({ request }) => {
+    const response = await request.get('/api/builds/123/logs')
+    expect(response.status()).toBe(401)
+  })
+
+  test('log download requires authentication', async ({ request }) => {
+    const response = await request.get('/api/builds/123/logs/download')
+    expect(response.status()).toBe(401)
+  })
+})
