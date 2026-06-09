@@ -3,7 +3,7 @@ import { getTree, getRepo } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import RepoSettingsNav from '@/components/repo-settings-nav'
-import { Folder, File } from 'lucide-react'
+import { Folder, File, FileCode, FileJson, FileText, FileImage, FileArchive } from 'lucide-react'
 
 interface Props {
   params: Promise<{ owner: string; repo: string; path: string[] }>
@@ -21,6 +21,21 @@ function filterTreeLevel(entries: Array<{ path: string; type: 'tree' | 'blob'; s
     .filter((e) => e.path.startsWith(normalized))
     .map((e) => ({ ...e, path: e.path.slice(normalized.length) }))
     .filter((e) => !e.path.includes('/'))
+}
+
+function fileIcon(filename: string) {
+  const ext = filename.split('.').pop()?.toLowerCase() ?? ''
+  const codeExts = new Set(['ts', 'tsx', 'js', 'jsx', 'py', 'rs', 'go', 'rb', 'c', 'cpp', 'h', 'java', 'kt', 'swift', 'scala', 'r', 'dart', 'zig', 'lua', 'elm', 'hs', 'clj', 'ex', 'exs', 'erl', 'jl'])
+  const jsonExts = new Set(['json', 'jsonc', 'json5'])
+  const imgExts = new Set(['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'ico', 'bmp'])
+  const archiveExts = new Set(['zip', 'tar', 'gz', 'bz2', 'xz', '7z', 'rar'])
+
+  if (codeExts.has(ext)) return FileCode
+  if (jsonExts.has(ext)) return FileJson
+  if (imgExts.has(ext)) return FileImage
+  if (archiveExts.has(ext)) return FileArchive
+  if (ext === 'md' || ext === 'txt' || ext === 'pdf') return FileText
+  return File
 }
 
 export default async function TreeViewPage({ params }: Props) {
@@ -63,7 +78,16 @@ export default async function TreeViewPage({ params }: Props) {
     )
   }
 
+  const sorted = entries
+    .slice()
+    .sort((a, b) => {
+      if (a.type !== b.type) return a.type === 'tree' ? -1 : 1
+      return a.path.localeCompare(b.path)
+    })
+
   const treeBase = `/repositories/${owner}/${repo}/tree`
+  const dirCount = sorted.filter((e) => e.type === 'tree').length
+  const fileCount = sorted.filter((e) => e.type === 'blob').length
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-10">
@@ -94,8 +118,13 @@ export default async function TreeViewPage({ params }: Props) {
         })}
       </nav>
 
+      {/* Summary */}
+      <p className="text-xs text-muted-foreground mb-3">
+        {dirCount} {dirCount === 1 ? 'directory' : 'directories'}, {fileCount} {fileCount === 1 ? 'file' : 'files'}
+      </p>
+
       {/* File listing */}
-      {entries.length === 0 ? (
+      {sorted.length === 0 ? (
         <div className="border border-dashed border-border rounded-lg p-8 text-center">
           <Folder className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">This directory is empty.</p>
@@ -110,47 +139,42 @@ export default async function TreeViewPage({ params }: Props) {
               </tr>
             </thead>
             <tbody>
-              {entries
-                .slice()
-                .sort((a, b) => {
-                  if (a.type !== b.type) return a.type === 'tree' ? -1 : 1
-                  return a.path.localeCompare(b.path)
-                })
-                .map((entry) => {
-                  if (entry.type === 'tree') {
-                    const dirHref = currentDir
-                      ? `${treeBase}/${currentDir}/${entry.path}`
-                      : `${treeBase}/${entry.path}`
-                    return (
-                      <tr key={entry.sha} className="border-b border-border last:border-b-0 hover:bg-secondary/20 transition-colors">
-                        <td className="px-4 py-3">
-                          <Link href={dirHref} className="flex items-center gap-2 text-foreground hover:text-primary">
-                            <Folder className="w-4 h-4 shrink-0 text-muted-foreground" />
-                            <span>{entry.path}</span>
-                          </Link>
-                        </td>
-                        <td className="px-4 py-3 text-right text-muted-foreground">&mdash;</td>
-                      </tr>
-                    )
-                  }
-                  const blobPath = currentDir ? `${currentDir}/${entry.path}` : entry.path
+              {sorted.map((entry) => {
+                if (entry.type === 'tree') {
+                  const dirHref = currentDir
+                    ? `${treeBase}/${currentDir}/${entry.path}`
+                    : `${treeBase}/${entry.path}`
                   return (
                     <tr key={entry.sha} className="border-b border-border last:border-b-0 hover:bg-secondary/20 transition-colors">
                       <td className="px-4 py-3">
-                        <Link
-                          href={`/repositories/${owner}/${repo}/blob/${entry.sha}?path=${encodeURIComponent(blobPath)}`}
-                          className="flex items-center gap-2 text-foreground hover:text-primary"
-                        >
-                          <File className="w-4 h-4 shrink-0 text-muted-foreground" />
+                        <Link href={dirHref} className="flex items-center gap-2 text-foreground hover:text-primary">
+                          <Folder className="w-4 h-4 shrink-0 text-sky-500" />
                           <span>{entry.path}</span>
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-right text-muted-foreground font-mono text-xs">
-                        {humanSize(entry.size)}
-                      </td>
+                      <td className="px-4 py-3 text-right text-muted-foreground">&mdash;</td>
                     </tr>
                   )
-                })}
+                }
+                const blobPath = currentDir ? `${currentDir}/${entry.path}` : entry.path
+                const Icon = fileIcon(entry.path)
+                return (
+                  <tr key={entry.sha} className="border-b border-border last:border-b-0 hover:bg-secondary/20 transition-colors">
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/repositories/${owner}/${repo}/blob/${entry.sha}?path=${encodeURIComponent(blobPath)}`}
+                        className="flex items-center gap-2 text-foreground hover:text-primary"
+                      >
+                        <Icon className="w-4 h-4 shrink-0 text-muted-foreground" />
+                        <span>{entry.path}</span>
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-right text-muted-foreground font-mono text-xs">
+                      {humanSize(entry.size)}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

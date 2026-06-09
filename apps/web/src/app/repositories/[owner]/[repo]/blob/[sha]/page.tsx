@@ -3,8 +3,9 @@ import { getBlob } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import RepoSettingsNav from '@/components/repo-settings-nav'
-import { ArrowLeft, Copy, Check } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { CopyButton } from '../../copy-button'
+import CodeBlock from '@/components/code-block'
 
 interface Props {
   params: Promise<{ owner: string; repo: string; sha: string }>
@@ -44,7 +45,6 @@ export default async function BlobViewPage({ params, searchParams }: Props) {
   const treeBase = `/repositories/${owner}/${repo}/tree`
   const backHref = parentDir ? `${treeBase}/${parentDir}` : treeBase
 
-  // Detect language from filename for display
   const ext = displayName.split('.').pop()?.toLowerCase() ?? ''
   const langMap: Record<string, string> = {
     ts: 'TypeScript', tsx: 'TSX', js: 'JavaScript', jsx: 'JSX',
@@ -83,15 +83,13 @@ export default async function BlobViewPage({ params, searchParams }: Props) {
           </div>
           <CopyButton url={decodedContent} />
         </div>
-        <div className="bg-zinc-950 text-zinc-100 p-4 overflow-auto">
-          {decodedContent ? (
-            <pre className="text-sm font-mono leading-relaxed whitespace-pre">
-              <code>{decodedContent}</code>
-            </pre>
-          ) : (
-            <span className="text-zinc-500 text-sm italic">Empty file</span>
-          )}
-        </div>
+        {decodedContent ? (
+          <CodeBlock content={decodedContent} filename={displayName} />
+        ) : (
+          <div className="bg-zinc-950 text-zinc-500 text-sm italic p-4">
+            Empty file
+          </div>
+        )}
       </div>
     </main>
   )

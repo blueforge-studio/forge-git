@@ -2,7 +2,7 @@ import { getSession } from '@/lib/session'
 import { getUser, listUserRepos, listUserOrgs } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
-import { Mail, Shield, Calendar, Server, Star, GitFork, Building2 } from 'lucide-react'
+import { Mail, Shield, Calendar, Server, Star, GitFork, Building2, Users } from 'lucide-react'
 
 interface Props {
   params: Promise<{ username: string }>
@@ -37,6 +37,9 @@ export default async function UserProfilePage({ params }: Props) {
     year: 'numeric', month: 'long', day: 'numeric',
   })
 
+  const totalStars = repos.reduce((sum, r) => sum + (r.stars_count ?? 0), 0)
+  const totalForks = repos.reduce((sum, r) => sum + (r.forks_count ?? 0), 0)
+
   return (
     <main className="max-w-5xl mx-auto px-6 py-10">
       <nav className="text-sm text-muted-foreground mb-6">
@@ -55,7 +58,7 @@ export default async function UserProfilePage({ params }: Props) {
       </div>
 
       {/* Info row */}
-      <div className="flex flex-wrap gap-4 mb-8">
+      <div className="flex flex-wrap gap-4 mb-6">
         {user.email && (
           <span className="flex items-center gap-2 text-sm text-muted-foreground">
             <Mail className="w-4 h-4" />{user.email}
@@ -68,10 +71,38 @@ export default async function UserProfilePage({ params }: Props) {
         <span className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="w-4 h-4" />Joined {joinedDate}
         </span>
-        <span className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Server className="w-4 h-4" />
-          {repos.length} {repos.length === 1 ? 'repository' : 'repositories'}
-        </span>
+      </div>
+
+      {/* Stats bar */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="border border-border rounded-lg p-4 text-center">
+          <div className="text-2xl font-semibold">{repos.length}</div>
+          <div className="text-xs text-muted-foreground flex items-center justify-center gap-1.5 mt-1">
+            <Server className="w-3 h-3" />
+            Repositories
+          </div>
+        </div>
+        <div className="border border-border rounded-lg p-4 text-center">
+          <div className="text-2xl font-semibold">{totalStars}</div>
+          <div className="text-xs text-muted-foreground flex items-center justify-center gap-1.5 mt-1">
+            <Star className="w-3 h-3" />
+            Stars
+          </div>
+        </div>
+        <div className="border border-border rounded-lg p-4 text-center">
+          <div className="text-2xl font-semibold">{totalForks}</div>
+          <div className="text-xs text-muted-foreground flex items-center justify-center gap-1.5 mt-1">
+            <GitFork className="w-3 h-3" />
+            Forks
+          </div>
+        </div>
+        <div className="border border-border rounded-lg p-4 text-center">
+          <div className="text-2xl font-semibold">{orgs.length}</div>
+          <div className="text-xs text-muted-foreground flex items-center justify-center gap-1.5 mt-1">
+            <Users className="w-3 h-3" />
+            Organizations
+          </div>
+        </div>
       </div>
 
       {/* Organizations */}
