@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation'
 import { deploymentsQueue } from '@/lib/queue'
 import { Badge, Button } from '@forge-git/ui'
 import BuildLogViewer from '@/components/build-log-viewer'
+import BuildLogStreamer from '@/components/build-log-streamer'
 import BuildArtifactList from '@/components/build-artifact-list'
 import JobTimestamps from '@/components/job-timestamps'
 import Link from 'next/link'
@@ -86,21 +87,24 @@ export default async function BuildDetailPage({ params }: Props) {
         </div>
 
         {(state === 'active' || state === 'waiting') && (
-          <div className="border border-border rounded-lg p-6">
-            <h2 className="text-sm font-semibold mb-2">Progress</h2>
-            <div className="w-full bg-secondary rounded-full h-2">
-              <div
-                className="bg-primary h-2 rounded-full transition-all"
-                style={{ width: `${typeof progress === 'number' ? progress : 0}%` }}
-              />
+          <>
+            <div className="border border-border rounded-lg p-6">
+              <h2 className="text-sm font-semibold mb-2">Progress</h2>
+              <div className="w-full bg-secondary rounded-full h-2">
+                <div
+                  className="bg-primary h-2 rounded-full transition-all"
+                  style={{ width: `${typeof progress === 'number' ? progress : 0}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {typeof progress === 'number' ? `${progress}%` : '0%'}
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {typeof progress === 'number' ? `${progress}%` : '0%'}
-            </p>
-          </div>
+            <BuildLogStreamer jobId={id} />
+          </>
         )}
 
-        {logsToShow && (
+        {(state === 'completed' || state === 'failed') && logsToShow && (
           <BuildLogViewer
             logs={logsToShow}
             title={state === 'failed' ? 'Error' : 'Result'}

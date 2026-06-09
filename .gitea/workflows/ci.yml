@@ -91,3 +91,47 @@ jobs:
         working-directory: apps/web
         env:
           CI: true
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: e2e
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        image:
+          - name: deploy-runner
+            dockerfile: packages/deploy-runner/Dockerfile
+          - name: web
+            dockerfile: apps/web/Dockerfile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to Gitea Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.GITEA_REGISTRY || 'forge-git.blueforge.studio' }}
+          username: ${{ secrets.GITEA_REGISTRY_USER || 'forge-admin' }}
+          password: ${{ secrets.GITEA_REGISTRY_TOKEN }}
+
+      - name: Build and push deploy-runner
+        if: matrix.image.name == 'deploy-runner'
+        run: |
+          docker build \
+            -f ${{ matrix.image.dockerfile }} \
+            -t ${{ vars.GITEA_REGISTRY || 'forge-git.blueforge.studio' }}/forge-admin/forge-git-deploy-runner:${{ github.sha }} \
+            -t ${{ vars.GITEA_REGISTRY || 'forge-git.blueforge.studio' }}/forge-admin/forge-git-deploy-runner:latest \
+            .
+          docker push ${{ vars.GITEA_REGISTRY || 'forge-git.blueforge.studio' }}/forge-admin/forge-git-deploy-runner:${{ github.sha }}
+          docker push ${{ vars.GITEA_REGISTRY || 'forge-git.blueforge.studio' }}/forge-admin/forge-git-deploy-runner:latest
+
+      - name: Build and push web
+        if: matrix.image.name == 'web'
+        run: |
+          docker build \
+            -f ${{ matrix.image.dockerfile }} \
+            -t ${{ vars.GITEA_REGISTRY || 'forge-git.blueforge.studio' }}/forge-admin/forge-git-web:${{ github.sha }} \
+            -t ${{ vars.GITEA_REGISTRY || 'forge-git.blueforge.studio' }}/forge-admin/forge-git-web:latest \
+            .
+          docker push ${{ vars.GITEA_REGISTRY || 'forge-git.blueforge.studio' }}/forge-admin/forge-git-web:${{ github.sha }}
+          docker push ${{ vars.GITEA_REGISTRY || 'forge-git.blueforge.studio' }}/forge-admin/forge-git-web:latest

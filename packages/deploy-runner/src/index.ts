@@ -29,6 +29,27 @@ const CLONE_TIMEOUT_MS = 5 * 60 * 1000
 const asyncExec = promisify(exec)
 
 // ---------------------------------------------------------------------------
+// Redis pub/sub for log streaming
+// ---------------------------------------------------------------------------
+
+let pubClient: Redis | null = null
+
+function getPubClient(): Redis {
+  if (!pubClient) {
+    pubClient = new Redis(REDIS_URL)
+  }
+  return pubClient
+}
+
+function publishLog(jobId: string, entry: Record<string, unknown>): void {
+  try {
+    getPubClient().publish(`build:${jobId}:logs`, JSON.stringify(entry))
+  } catch {
+    // Best-effort — don't fail the build if pub/sub is unavailable
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Logger
 // ---------------------------------------------------------------------------
 
@@ -46,6 +67,8 @@ function log(level: LogLevel, jobId: string | undefined, message: string, ...arg
   if (level === 'error') console.error(output)
   else if (level === 'warn') console.warn(output)
   else console.log(output)
+
+  if (jobId) publishLog(jobId, entry)
 }
 
 const logger = {

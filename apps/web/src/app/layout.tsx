@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/header'
 import { ThemeProvider } from '@/components/theme-provider'
+import ErrorTrackerProvider from '@/components/error-tracker-provider'
 
 export const metadata: Metadata = {
   title: 'forge-git — Self-hosted Git Platform',
@@ -20,10 +21,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        <ThemeProvider>
-          <Header />
-          {children}
-        </ThemeProvider>
+        <ErrorTrackerProvider>
+          <ThemeProvider>
+            <Header />
+            {children}
+          </ThemeProvider>
+        </ErrorTrackerProvider>
       </body>
     </html>
   )

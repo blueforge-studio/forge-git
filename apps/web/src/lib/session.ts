@@ -1,55 +1,34 @@
+/**
+ * Session management — iron-session backed, compatible with @blueforge-studio/auth-session.
+ *
+ * Public API is backward-compatible with the old hand-rolled HMAC cookies.
+ * New code should use createAuthActions(forgeAuthAdapter) and createAuthMiddleware()
+ * from @blueforge-studio/auth-session for full auth flow support.
+ */
+
 import { cookies } from 'next/headers'
-import { createHmac, timingSafeEqual } from 'node:crypto'
+import { getIronSession } from 'iron-session'
+import type { SessionOptions } from 'iron-session'
+import {
+  createAuthActions,
+  createAuthMiddleware,
+  configureSession,
+  getCookieName,
+  type AuthActionOptions,
+  type AuthMiddlewareConfig,
+} from '@blueforge-studio/auth-session'
 
-const SESSION_COOKIE = 'forge-git-session'
+export { createAuthActions, createAuthMiddleware, configureSession, getCookieName }
+export type { AuthActionOptions, AuthMiddlewareConfig }
 
-// ─── PAT Session ────────────────────────────────────────────────────────────
+// ---------------------------------------------------------------------------
+// Session types (backward-compatible)
+// ---------------------------------------------------------------------------
 
 export interface Session {
   baseUrl: string
   token: string
 }
-
-export async function getSession(): Promise<Session | null> {
-  const cookieStore = await cookies()
-  const raw = cookieStore.get(SESSION_COOKIE)?.value
-  if (!raw) return null
-
-  // If the cookie contains a dot, it's a signed OAuth session — try that first
-  if (raw.includes('.')) {
-    const oauth = parseOAuthSessionCookie(raw)
-    if (oauth) return { baseUrl: oauth.baseUrl, token: oauth.token }
-    return null
-  }
-
-  try {
-    return JSON.parse(atob(raw)) as Session
-  } catch {
-    return null
-  }
-}
-
-export async function createSession(
-  baseUrl: string,
-  token: string
-): Promise<void> {
-  const cookieStore = await cookies()
-  const value = btoa(JSON.stringify({ baseUrl, token }))
-  cookieStore.set(SESSION_COOKIE, value, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7,
-  })
-}
-
-export async function clearSession(): Promise<void> {
-  const cookieStore = await cookies()
-  cookieStore.delete(SESSION_COOKIE)
-}
-
-// ─── OAuth Session ──────────────────────────────────────────────────────────
 
 export interface OAuthSession {
   baseUrl: string
@@ -58,57 +37,72 @@ export interface OAuthSession {
   expiresAt?: number
 }
 
-let _secretWarned = false
+// Extended session data stored in iron-session
+interface ForgeSessionData {
+  userId?: string
+  baseUrl?: string
+  token?: string
+  refreshToken?: string
+  expiresAt?: number
+}
 
-function getSessionSecret(): string {
-  const secret = process.env.SESSION_SECRET
-  if (secret) return secret
-  if (!_secretWarned) {
-    _secretWarned = true
-    console.warn(
-      '[forge-git] SESSION_SECRET env var is not set. Using insecure development default.'
-    )
+const SESSION_COOKIE = 'forge-git-session'
+
+const sessionOptions: SessionOptions = {
+  password:
+    process.env.SESSION_SECRET ||
+    'forge-git-dev-secret-that-is-at-least-32-chars-long',
+  cookieName: SESSION_COOKIE,
+  ttl: 60 * 60 * 24 * 7, // 7 days
+  cookieOptions: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'lax',
+  },
+}
+
+// Configure auth-session to use the same cookie name and options
+configureSession(sessionOptions)
+
+// ---------------------------------------------------------------------------
+// Internal — get iron-session
+// ---------------------------------------------------------------------------
+
+async function getForgeSession() {
+  const cookieStore = await cookies()
+  return getIronSession<ForgeSessionData>(cookieStore, sessionOptions)
+}
+
+// ---------------------------------------------------------------------------
+// PAT Session (backward-compatible API)
+// ---------------------------------------------------------------------------
+
+export async function getSession(): Promise<Session | null> {
+  const session = await getForgeSession()
+  if (session.token && session.baseUrl) {
+    return { baseUrl: session.baseUrl, token: session.token }
   }
-  return 'forge-git-dev-secret-do-not-use-in-production'
+  return null
 }
 
-function signPayload(payload: string): string {
-  return createHmac('sha256', getSessionSecret())
-    .update(payload, 'utf-8')
-    .digest('hex')
+export async function createSession(
+  baseUrl: string,
+  token: string,
+): Promise<void> {
+  const session = await getForgeSession()
+  session.baseUrl = baseUrl
+  session.token = token
+  await session.save()
 }
 
-function verifySignature(payload: string, signature: string): boolean {
-  const expected = signPayload(payload)
-  if (expected.length !== signature.length) return false
-  try {
-    return timingSafeEqual(Buffer.from(expected), Buffer.from(signature))
-  } catch {
-    return false
-  }
+export async function clearSession(): Promise<void> {
+  const session = await getForgeSession()
+  session.destroy()
 }
 
-function serializeOAuthSession(session: OAuthSession): string {
-  const payload = btoa(JSON.stringify(session))
-  const signature = signPayload(payload)
-  return `${payload}.${signature}`
-}
-
-function parseOAuthSessionCookie(raw: string): OAuthSession | null {
-  const dotIndex = raw.lastIndexOf('.')
-  if (dotIndex < 1) return null
-
-  const payload = raw.slice(0, dotIndex)
-  const signature = raw.slice(dotIndex + 1)
-
-  if (!signature || !verifySignature(payload, signature)) return null
-
-  try {
-    return JSON.parse(atob(payload)) as OAuthSession
-  } catch {
-    return null
-  }
-}
+// ---------------------------------------------------------------------------
+// OAuth Session (backward-compatible API)
+// ---------------------------------------------------------------------------
 
 export async function createOAuthSession(
   baseUrl: string,
@@ -116,39 +110,24 @@ export async function createOAuthSession(
   refreshToken?: string,
   expiresIn?: number,
 ): Promise<void> {
-  const cookieStore = await cookies()
-  const expiresAt = expiresIn ? Date.now() + expiresIn * 1000 : undefined
-
-  const session: OAuthSession = {
-    baseUrl,
-    token: accessToken,
-    ...(refreshToken ? { refreshToken } : {}),
-    ...(expiresAt ? { expiresAt } : {}),
-  }
-
-  const value = serializeOAuthSession(session)
-  cookieStore.set(SESSION_COOKIE, value, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: expiresIn
-      ? Math.min(expiresIn, 60 * 60 * 24 * 7)
-      : 60 * 60 * 24 * 7,
-  })
+  const session = await getForgeSession()
+  session.baseUrl = baseUrl
+  session.token = accessToken
+  if (refreshToken) session.refreshToken = refreshToken
+  if (expiresIn) session.expiresAt = Date.now() + expiresIn * 1000
+  await session.save()
 }
 
 export async function getOAuthSession(): Promise<OAuthSession | null> {
-  const cookieStore = await cookies()
-  const raw = cookieStore.get(SESSION_COOKIE)?.value
-  if (!raw || !raw.includes('.')) return null
-
-  const session = parseOAuthSessionCookie(raw)
-  if (!session) return null
-
+  const session = await getForgeSession()
+  if (!session.token || !session.baseUrl) return null
   if (session.expiresAt && Date.now() > session.expiresAt) return null
-
-  return session
+  return {
+    baseUrl: session.baseUrl,
+    token: session.token,
+    ...(session.refreshToken ? { refreshToken: session.refreshToken } : {}),
+    ...(session.expiresAt ? { expiresAt: session.expiresAt } : {}),
+  }
 }
 
 export async function getActiveSession(): Promise<Session | null> {
