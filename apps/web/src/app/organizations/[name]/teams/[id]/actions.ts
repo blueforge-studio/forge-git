@@ -109,3 +109,76 @@ export async function updateTeamAction(
   revalidatePath(`/organizations/${org}/teams/${teamId}`)
   return { error: '', field: '' }
 }
+
+export async function addTeamRepoAction(
+  prevState: { error: string; field: string },
+  formData: FormData
+) {
+  const session = await getSession()
+  if (!session) redirect('/login')
+
+  const teamId = Number(formData.get('teamId'))
+  const org = (formData.get('org') as string).trim()
+  const repoName = (formData.get('repoName') as string).trim()
+
+  if (!teamId) return { error: 'Team ID is required', field: '' }
+  if (!repoName) return { error: 'Repository name is required', field: 'repoName' }
+
+  try {
+    const token = session.token
+    const baseUrl = process.env.GITEA_URL ?? process.env.FORGE_GIT_URL ?? 'http://localhost:3001'
+    const url = `${baseUrl}/api/v1/teams/${teamId}/repos/${org}/${repoName}`
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new Error(`Gitea API ${res.status}: ${text}`)
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    if (msg.includes('404')) {
+      return { error: `Repository "${org}/${repoName}" not found`, field: 'repoName' }
+    }
+    return { error: `Failed to add repository: ${msg}`, field: '' }
+  }
+
+  revalidatePath(`/organizations/${org}/teams/${teamId}`)
+  return { error: '', field: '' }
+}
+
+export async function removeTeamRepoAction(
+  prevState: { error: string; field: string },
+  formData: FormData
+) {
+  const session = await getSession()
+  if (!session) redirect('/login')
+
+  const teamId = Number(formData.get('teamId'))
+  const org = (formData.get('org') as string).trim()
+  const repoName = (formData.get('repoName') as string).trim()
+
+  if (!teamId) return { error: 'Team ID is required', field: '' }
+  if (!repoName) return { error: 'Repository name is required', field: '' }
+
+  try {
+    const token = session.token
+    const baseUrl = process.env.GITEA_URL ?? process.env.FORGE_GIT_URL ?? 'http://localhost:3001'
+    const url = `${baseUrl}/api/v1/teams/${teamId}/repos/${org}/${repoName}`
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new Error(`Gitea API ${res.status}: ${text}`)
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    return { error: `Failed to remove repository: ${msg}`, field: '' }
+  }
+
+  revalidatePath(`/organizations/${org}/teams/${teamId}`)
+  return { error: '', field: '' }
+}

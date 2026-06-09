@@ -3,6 +3,7 @@ import { getTeam, listTeamMembers, listTeamRepos } from '@forge-git/gitea-bridge
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import TeamSidebar from '@/components/team-sidebar'
+import TeamRepoManager from '@/components/team-repo-manager'
 import { Shield, ArrowLeft } from 'lucide-react'
 
 interface Props {
@@ -72,25 +73,7 @@ export default async function TeamDetailPage({ params }: Props) {
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <h2 className="text-lg font-semibold mb-4">Repositories</h2>
-          {repos.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No repositories assigned to this team.</p>
-          ) : (
-            <div className="grid gap-2">
-              {repos.map((repo) => (
-                <Link
-                  key={repo.id}
-                  href={`/repositories/${repo.full_name}`}
-                  className="border border-border rounded-lg p-3 hover:border-ring transition-colors flex items-center justify-between"
-                >
-                  <span className="text-sm font-medium">{repo.full_name}</span>
-                  {repo.language && (
-                    <span className="text-xs text-muted-foreground">{repo.language}</span>
-                  )}
-                </Link>
-              ))}
-            </div>
-          )}
+          <TeamRepoManager teamId={team.id} orgName={orgName} repos={repos} />
         </div>
 
         <TeamSidebar team={team} orgName={orgName} members={members} />

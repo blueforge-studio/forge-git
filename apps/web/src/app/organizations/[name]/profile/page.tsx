@@ -2,7 +2,8 @@ import { getSession } from '@/lib/session'
 import { getOrg, listOrgMembers } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
-import { Building2, Globe, ExternalLink } from 'lucide-react'
+import { Building2, Globe } from 'lucide-react'
+import OrgNav from '@/components/org-nav'
 
 interface Props {
   params: Promise<{ name: string }>
@@ -50,6 +51,8 @@ export default async function OrgProfilePage({ params }: Props) {
         <span className="mx-2">/</span>
         <span className="text-foreground">Profile</span>
       </nav>
+
+      <OrgNav orgName={org.name} activeTab="overview" />
 
       {/* Header */}
       <div className="flex items-start gap-6 mb-10">
@@ -115,14 +118,6 @@ export default async function OrgProfilePage({ params }: Props) {
         ))}
       </div>
 
-      {/* Link to org management */}
-      <Link
-        href={`/organizations/${name}`}
-        className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-      >
-        <ExternalLink className="w-4 h-4" />
-        View organization management page
-      </Link>
     </main>
   )
 }

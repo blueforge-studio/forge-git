@@ -2,7 +2,7 @@
 
 import { getSession } from '@/lib/session'
 import { createOrg, addOrgMember, removeOrgMember, createTeam, updateOrg } from '@forge-git/gitea-bridge'
-import type { CreateOrgRequest } from '@forge-git/gitea-bridge'
+import type { CreateOrgRequest, GiteaOpts } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
@@ -150,4 +150,39 @@ export async function editOrgAction(
 
   revalidatePath(`/organizations/${org}`)
   redirect(`/organizations/${org}`)
+}
+
+export async function deleteOrgAction(
+  prevState: { error: string; field: string },
+  formData: FormData
+) {
+  const session = await getSession()
+  if (!session) redirect('/login')
+
+  const orgName = (formData.get('orgName') as string).trim()
+
+  if (!orgName) return { error: 'Organization name is required', field: 'orgName' }
+
+  try {
+    const token = session.token
+    const baseUrl = process.env.GITEA_URL ?? process.env.FORGE_GIT_URL ?? 'http://localhost:3001'
+    const url = `${baseUrl}/api/v1/orgs/${orgName}`
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new Error(`Gitea API ${res.status}: ${text}`)
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    if (msg.includes('404')) {
+      return { error: 'Organization not found', field: '' }
+    }
+    return { error: `Failed to delete organization: ${msg}`, field: '' }
+  }
+
+  revalidatePath('/organizations')
+  redirect('/organizations')
 }
