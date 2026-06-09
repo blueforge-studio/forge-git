@@ -12,6 +12,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      'next/headers': path.resolve(__dirname, './src/__tests__/__mocks__/next-headers.ts'),
+      '@blueforge-studio/auth-session': path.resolve(__dirname, './src/__tests__/__mocks__/auth-session.ts'),
     },
   },
 })

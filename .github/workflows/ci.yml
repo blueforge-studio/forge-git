@@ -27,6 +27,12 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - name: Authenticate with Packr registry
+        run: |
+          echo "//api.packr.blueforge.studio/:_authToken=${PACKR_TOKEN}" >> .npmrc
+        env:
+          PACKR_TOKEN: ${{ secrets.PACKR_TOKEN }}
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -50,6 +56,12 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+
+      - name: Authenticate with Packr registry
+        run: |
+          echo "//api.packr.blueforge.studio/:_authToken=${PACKR_TOKEN}" >> .npmrc
+        env:
+          PACKR_TOKEN: ${{ secrets.PACKR_TOKEN }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -86,6 +98,12 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+
+      - name: Authenticate with Packr registry
+        run: |
+          echo "//api.packr.blueforge.studio/:_authToken=${PACKR_TOKEN}" >> .npmrc
+        env:
+          PACKR_TOKEN: ${{ secrets.PACKR_TOKEN }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

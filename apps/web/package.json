@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1064.0",
@@ -23,6 +26,7 @@
     "@forge-git/ui": "workspace:*",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.0.0",
+    "drizzle-orm": "^0.45.2",
     "ioredis": "^5.4.0",
     "iron-session": "^8.0.4",
     "lucide-react": "^0.577.0",
@@ -37,10 +41,11 @@
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^16.0.0",
     "@types/node": "^22.0.0",
-    "@types/pg": "^8.0.0",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.0.0",
+    "drizzle-kit": "^0.31.10",
     "jsdom": "^25.0.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",

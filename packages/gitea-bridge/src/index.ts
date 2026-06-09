@@ -143,8 +143,14 @@ export {
 export {
   listIssueComments,
   createIssueComment,
+  updateIssueComment,
   deleteIssueComment,
+  listPullReviews,
+  createPullReview,
+  listPullReviewComments,
 } from './comment'
+
+export type { PullReview, PullReviewComment } from './comment'
 
 // ─── Webhooks ───────────────────────────────────────────────────────────────
 
