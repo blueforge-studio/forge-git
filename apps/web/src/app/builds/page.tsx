@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { deploymentsQueue } from '@/lib/queue'
 import BuildsList from '@/components/builds-list'
 import TriggerBuildForm from '@/components/trigger-build-form'
+import BuildsPolling from '@/components/builds-polling'
 
 async function getJobs() {
   const [completed, failed, waiting, active] = await Promise.all([
@@ -55,6 +56,7 @@ export default async function BuildsPage({ searchParams }: Props) {
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-10">
+      {!redisError && <BuildsPolling />}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-semibold">Builds</h1>
