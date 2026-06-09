@@ -3,7 +3,8 @@ import { getBlob } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import RepoSettingsNav from '@/components/repo-settings-nav'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Copy, Check } from 'lucide-react'
+import { CopyButton } from '../../copy-button'
 
 interface Props {
   params: Promise<{ owner: string; repo: string; sha: string }>
@@ -22,7 +23,7 @@ export default async function BlobViewPage({ params, searchParams }: Props) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     return (
-      <main className="max-w-4xl mx-auto px-6 py-10">
+      <main className="max-w-5xl mx-auto px-6 py-10">
         <RepoSettingsNav owner={owner} repo={repo} activeTab="files" />
         <div className="border border-destructive/30 rounded-lg p-8 text-center">
           <p className="text-sm text-destructive mb-2">Unable to load file</p>
@@ -37,20 +38,27 @@ export default async function BlobViewPage({ params, searchParams }: Props) {
     : blob.content
 
   const displayName = filename ?? sha.slice(0, 7)
-
-  // Determine parent tree directory for the back link
   const parentDir = filename
     ? filename.split('/').slice(0, -1).join('/')
     : ''
-
   const treeBase = `/repositories/${owner}/${repo}/tree`
   const backHref = parentDir ? `${treeBase}/${parentDir}` : treeBase
 
+  // Detect language from filename for display
+  const ext = displayName.split('.').pop()?.toLowerCase() ?? ''
+  const langMap: Record<string, string> = {
+    ts: 'TypeScript', tsx: 'TSX', js: 'JavaScript', jsx: 'JSX',
+    json: 'JSON', yaml: 'YAML', yml: 'YAML', md: 'Markdown',
+    css: 'CSS', html: 'HTML', sql: 'SQL', sh: 'Shell',
+    py: 'Python', rs: 'Rust', go: 'Go', rb: 'Ruby',
+    dockerfile: 'Dockerfile',
+  }
+
   return (
-    <main className="max-w-4xl mx-auto px-6 py-10">
+    <main className="max-w-5xl mx-auto px-6 py-10">
       <RepoSettingsNav owner={owner} repo={repo} activeTab="files" />
 
-      <div className="mb-6">
+      <div className="mb-4">
         <Link
           href={backHref}
           className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5"
@@ -61,12 +69,29 @@ export default async function BlobViewPage({ params, searchParams }: Props) {
       </div>
 
       <div className="border border-border rounded-lg overflow-hidden">
-        <div className="border-b border-border bg-secondary/30 px-4 py-2.5">
-          <h2 className="text-sm font-semibold font-mono">{displayName}</h2>
+        <div className="border-b border-border bg-secondary/30 px-4 py-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h2 className="text-sm font-semibold font-mono">{displayName}</h2>
+            {langMap[ext] && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
+                {langMap[ext]}
+              </span>
+            )}
+            <span className="text-xs text-muted-foreground">
+              {blob.size.toLocaleString()} bytes
+            </span>
+          </div>
+          <CopyButton url={decodedContent} />
         </div>
-        <pre className="bg-zinc-950 text-zinc-100 rounded-b-md p-4 overflow-auto font-mono text-sm leading-relaxed">
-          {decodedContent || <span className="text-muted-foreground italic">Empty file</span>}
-        </pre>
+        <div className="bg-zinc-950 text-zinc-100 p-4 overflow-auto">
+          {decodedContent ? (
+            <pre className="text-sm font-mono leading-relaxed whitespace-pre">
+              <code>{decodedContent}</code>
+            </pre>
+          ) : (
+            <span className="text-zinc-500 text-sm italic">Empty file</span>
+          )}
+        </div>
       </div>
     </main>
   )

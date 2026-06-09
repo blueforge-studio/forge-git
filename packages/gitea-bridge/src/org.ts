@@ -4,6 +4,10 @@ export async function listOrgs(opts?: GiteaOpts): Promise<GiteaOrg[]> {
   return request<GiteaOrg[]>('/user/orgs', opts)
 }
 
+export async function listUserOrgs(username: string, opts?: GiteaOpts): Promise<GiteaOrg[]> {
+  return request<GiteaOrg[]>(`/users/${username}/orgs`, opts)
+}
+
 export async function getOrg(orgName: string, opts?: GiteaOpts): Promise<GiteaOrg> {
   return request<GiteaOrg>(`/orgs/${orgName}`, opts)
 }

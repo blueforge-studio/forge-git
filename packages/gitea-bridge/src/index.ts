@@ -69,6 +69,7 @@ export {
 
 export {
   listOrgs,
+  listUserOrgs,
   getOrg,
   createOrg,
   updateOrg,
