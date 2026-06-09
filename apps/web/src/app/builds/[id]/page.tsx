@@ -123,10 +123,17 @@ export default async function BuildDetailPage({ params }: Props) {
         />
 
         <div className="flex items-center gap-3 pt-2">
-          {state === 'failed' && (
-            <form action={retryJobAction.bind(null, id)}>
-              <Button type="submit" variant="outline" size="sm">Retry Build</Button>
-            </form>
+          {(state === 'completed' || state === 'failed') && (
+            <>
+              <a href={`/api/builds/${id}/logs/download`} download={`build-${id}.log`}>
+                <Button variant="outline" size="sm">Download Logs</Button>
+              </a>
+              {state === 'failed' && (
+                <form action={retryJobAction.bind(null, id)}>
+                  <Button type="submit" variant="outline" size="sm">Retry Build</Button>
+                </form>
+              )}
+            </>
           )}
           {(state === 'active' || state === 'waiting') && (
             <form action={cancelJobAction.bind(null, id)}>

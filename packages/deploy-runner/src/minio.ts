@@ -40,6 +40,21 @@ export async function uploadBuildArtifact(
   return `${MINIO_ENDPOINT}/${MINIO_BUCKET}/${key}`
 }
 
+export async function uploadBuildLog(
+  jobId: string,
+  logContent: string,
+): Promise<string> {
+  const client = getClient()
+  const key = `build-logs/${jobId}.log`
+  await client.send(new PutObjectCommand({
+    Bucket: MINIO_BUCKET,
+    Key: key,
+    Body: logContent,
+    ContentType: 'text/plain',
+  }))
+  return `${MINIO_ENDPOINT}/${MINIO_BUCKET}/${key}`
+}
+
 export async function listBuildArtifacts(
   repoId: string,
   commitSha: string,

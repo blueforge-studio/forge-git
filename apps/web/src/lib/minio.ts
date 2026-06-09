@@ -70,3 +70,19 @@ export async function listBuildArtifacts(
     return []
   }
 }
+
+export async function getBuildLog(jobId: string): Promise<string | null> {
+  const client = getClient()
+  if (!client) return null
+
+  try {
+    const key = `build-logs/${jobId}.log`
+    const result = await client.send(new GetObjectCommand({
+      Bucket: MINIO_BUCKET,
+      Key: key,
+    }))
+    return await result.Body?.transformToString() ?? null
+  } catch {
+    return null
+  }
+}
