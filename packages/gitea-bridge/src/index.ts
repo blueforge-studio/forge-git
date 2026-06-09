@@ -129,6 +129,7 @@ export {
 export {
   searchRepos,
   searchIssues,
+  searchPullRequests,
 } from './search'
 
 // ─── Notifications ──────────────────────────────────────────────────────────

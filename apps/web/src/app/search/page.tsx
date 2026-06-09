@@ -1,18 +1,20 @@
 import { getSession } from '@/lib/session'
 import { redirect } from 'next/navigation'
-import { searchRepos, searchIssues } from '@forge-git/gitea-bridge'
-import type { GiteaRepo, Issue } from '@forge-git/gitea-bridge'
+import { searchRepos, searchIssues, searchPullRequests } from '@forge-git/gitea-bridge'
+import type { GiteaRepo, Issue, PullRequest } from '@forge-git/gitea-bridge'
 import RepoCard from '@/components/repo-card'
 import EmptyState from '@/components/empty-state'
-import { Search, FileText } from 'lucide-react'
+import { Search, FileText, GitPullRequest } from 'lucide-react'
 import Link from 'next/link'
 
 interface Props {
-  searchParams: Promise<{ q?: string }>
+  searchParams: Promise<{ q?: string; page?: string }>
 }
 
+const PER_PAGE = 10
+
 export default async function SearchPage({ searchParams }: Props) {
-  const { q } = await searchParams
+  const { q, page: pageStr } = await searchParams
 
   const session = await getSession()
   if (!session) redirect('/login')
@@ -24,25 +26,42 @@ export default async function SearchPage({ searchParams }: Props) {
         <EmptyState
           icon={Search}
           title="Search everything"
-          description="Search repositories, issues, and pull requests"
+          description="Search repositories, issues, and pull requests. Press / to focus the search bar."
         />
       </main>
     )
   }
 
+  const page = Math.max(1, parseInt(pageStr ?? '1', 10) || 1)
+
   let repos: GiteaRepo[] = []
   let issues: Issue[] = []
+  let pulls: PullRequest[] = []
   let error = ''
 
   try {
-    const [repoResult, issueResult] = await Promise.all([
-      searchRepos(trimmed, session),
-      searchIssues(trimmed, session),
+    const [repoResult, issueResult, prResult] = await Promise.all([
+      searchRepos(trimmed, { ...session, page, limit: PER_PAGE }),
+      searchIssues(trimmed, { ...session, page, limit: PER_PAGE }),
+      searchPullRequests(trimmed, { ...session, page, limit: PER_PAGE }),
     ])
     repos = repoResult.data ?? []
     issues = issueResult.data ?? []
+    pulls = prResult.data ?? []
   } catch (err) {
     error = err instanceof Error ? err.message : String(err)
+  }
+
+  const total = repos.length + issues.length + pulls.length
+  const hasMore = repos.length === PER_PAGE || issues.length === PER_PAGE || pulls.length === PER_PAGE
+
+  // Helper to parse owner/repo from html_url
+  function parseFullName(htmlUrl: string): string {
+    const parts = htmlUrl.split('/')
+    const idx = parts.indexOf('issues') >= 0 ? parts.indexOf('issues') : parts.indexOf('pulls')
+    const owner = idx >= 2 ? parts[idx - 2] : ''
+    const repoName = idx >= 1 ? parts[idx - 1] : ''
+    return owner && repoName ? `${owner}/${repoName}` : ''
   }
 
   return (
@@ -52,7 +71,10 @@ export default async function SearchPage({ searchParams }: Props) {
           Search results for &ldquo;{trimmed}&rdquo;
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          {repos.length + issues.length} result{repos.length + issues.length !== 1 ? 's' : ''}
+          {total} result{total !== 1 ? 's' : ''}
+          {repos.length > 0 && ` · ${repos.length} repositor${repos.length === 1 ? 'y' : 'ies'}`}
+          {issues.length > 0 && ` · ${issues.length} issue${issues.length === 1 ? '' : 's'}`}
+          {pulls.length > 0 && ` · ${pulls.length} pull request${pulls.length === 1 ? '' : 's'}`}
         </p>
       </div>
 
@@ -75,15 +97,11 @@ export default async function SearchPage({ searchParams }: Props) {
       )}
 
       {issues.length > 0 && (
-        <section>
+        <section className="mb-10">
           <h2 className="text-lg font-medium mb-4">Issues</h2>
           <ul className="divide-y divide-border border border-border rounded-lg">
             {issues.map((issue) => {
-              const parts = issue.html_url.split('/')
-              const idx = parts.indexOf('issues')
-              const owner = idx >= 2 ? parts[idx - 2] : ''
-              const repoName = idx >= 1 ? parts[idx - 1] : ''
-              const fullName = owner && repoName ? `${owner}/${repoName}` : ''
+              const fullName = parseFullName(issue.html_url)
 
               return (
                 <li key={issue.id}>
@@ -106,12 +124,74 @@ export default async function SearchPage({ searchParams }: Props) {
         </section>
       )}
 
-      {!error && repos.length === 0 && issues.length === 0 && (
+      {pulls.length > 0 && (
+        <section className="mb-10">
+          <h2 className="text-lg font-medium mb-4">Pull Requests</h2>
+          <ul className="divide-y divide-border border border-border rounded-lg">
+            {pulls.map((pr) => {
+              const fullName = parseFullName(pr.html_url)
+
+              return (
+                <li key={pr.id}>
+                  <Link
+                    href={`/repositories/${fullName}/pulls/${pr.number}`}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors"
+                  >
+                    <GitPullRequest className={`w-4 h-4 shrink-0 ${
+                      pr.merged ? 'text-purple-500' : pr.state === 'open' ? 'text-green-500' : 'text-red-500'
+                    }`} />
+                    <span className="text-sm font-medium truncate">
+                      {pr.title}
+                    </span>
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full border shrink-0 ${
+                      pr.merged
+                        ? 'border-purple-500/30 text-purple-600 bg-purple-500/10'
+                        : pr.state === 'open'
+                          ? 'border-green-500/30 text-green-600 bg-green-500/10'
+                          : 'border-red-500/30 text-red-600 bg-red-500/10'
+                    }`}>
+                      {pr.merged ? 'Merged' : pr.state}
+                    </span>
+                    <span className="text-xs text-muted-foreground shrink-0">
+                      #{pr.number}
+                    </span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      )}
+
+      {!error && repos.length === 0 && issues.length === 0 && pulls.length === 0 && (
         <EmptyState
           icon={Search}
           title="No results found"
-          description={`No repositories or issues match "${trimmed}"`}
+          description={`No repositories, issues, or pull requests match "${trimmed}"`}
         />
+      )}
+
+      {/* Pagination */}
+      {total > 0 && (
+        <div className="flex items-center justify-center gap-4 mt-8">
+          {page > 1 && (
+            <Link
+              href={`/search?q=${encodeURIComponent(trimmed)}&page=${page - 1}`}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              &larr; Previous
+            </Link>
+          )}
+          <span className="text-sm text-muted-foreground">Page {page}</span>
+          {hasMore && (
+            <Link
+              href={`/search?q=${encodeURIComponent(trimmed)}&page=${page + 1}`}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Next &rarr;
+            </Link>
+          )}
+        </div>
       )}
     </main>
   )
