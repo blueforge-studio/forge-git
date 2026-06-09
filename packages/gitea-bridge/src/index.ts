@@ -7,6 +7,10 @@
  * Gitea API docs: https://docs.gitea.com/api/1.21/overview
  */
 
+// ─── Auth (OAuth2) ──────────────────────────────────────────────────────────
+
+export { getOAuthAuthorizeUrl, exchangeOAuthCode } from './oauth'
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type {
@@ -150,9 +154,18 @@ export {
   deleteWebhook,
 } from './webhook'
 
+export type {
+  GiteaPushEvent,
+  GiteaPREvent,
+} from './webhook-types'
+
 // ─── Tree / Blob ────────────────────────────────────────────────────────────
 
 export {
   getTree,
   getBlob,
 } from './tree'
+
+// ─── Artifacts (MinIO) ──────────────────────────────────────────────────────
+
+export type { BuildArtifact, BuildLog } from './artifact-types'

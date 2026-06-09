@@ -13,6 +13,7 @@ import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import { access, mkdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
+import { uploadBuildArtifact } from './minio'
 
 // ---------------------------------------------------------------------------
 // Config
@@ -194,16 +195,31 @@ async function processBuild(job: Job<BuildJob>) {
     await executeSteps(workflow.jobs.test.steps, workDir, job.id!)
     await job.updateProgress(80)
 
-    logger.info(job.id, 'Uploading artifacts...')
-    // TODO: minio client.putObject()
+    const buildLog = JSON.stringify({
+      jobId: job.id,
+      repo: `${orgId}/${repoId}`,
+      commit: commitSha,
+      branch,
+      completedAt: new Date().toISOString(),
+    })
+
+    try {
+      const artifactUrl = await uploadBuildArtifact(
+        repoId,
+        commitSha,
+        'build-result.json',
+        buildLog,
+        'application/json',
+      )
+      logger.info(job.id, `Artifacts uploaded: ${artifactUrl}`)
+    } catch (err) {
+      logger.warn(job.id, 'Failed to upload build artifact', err)
+    }
 
     await job.updateProgress(100)
     logger.info(job.id, `Build complete for ${orgId}/${repoId} @ ${commitSha}`)
 
-    return {
-      success: true,
-      artifactUrl: `https://minio.local/repos/${repoId}/${commitSha}`,
-    }
+    return { success: true, repoId: `${orgId}/${repoId}`, commitSha }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     logger.error(job.id, `Build failed: ${message}`)

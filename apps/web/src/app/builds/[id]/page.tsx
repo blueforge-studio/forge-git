@@ -3,10 +3,12 @@ import { redirect, notFound } from 'next/navigation'
 import { deploymentsQueue } from '@/lib/queue'
 import { Badge, Button } from '@forge-git/ui'
 import BuildLogViewer from '@/components/build-log-viewer'
+import BuildArtifactList from '@/components/build-artifact-list'
 import JobTimestamps from '@/components/job-timestamps'
 import Link from 'next/link'
 import { retryJobAction, cancelJobAction } from './actions'
 import { stateBadgeVariant } from '@/lib/build-utils'
+import { listBuildArtifacts } from '@/lib/minio'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -105,6 +107,11 @@ export default async function BuildDetailPage({ params }: Props) {
           />
         )}
 
+        <BuildArtifactsSection
+          repoId={String(data.repoId || '')}
+          commitSha={String(data.commitSha || '')}
+        />
+
         <JobTimestamps
           timestamp={job.timestamp}
           processedOn={job.processedOn}
@@ -126,4 +133,21 @@ export default async function BuildDetailPage({ params }: Props) {
       </div>
     </main>
   )
+}
+
+async function BuildArtifactsSection({
+  repoId,
+  commitSha,
+}: {
+  repoId: string
+  commitSha: string
+}) {
+  if (!repoId || !commitSha) return null
+
+  try {
+    const artifacts = await listBuildArtifacts(repoId, commitSha)
+    return <BuildArtifactList artifacts={artifacts} available />
+  } catch {
+    return <BuildArtifactList artifacts={[]} available={false} />
+  }
 }

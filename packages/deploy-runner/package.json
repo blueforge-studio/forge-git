@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1064.0",
     "bullmq": "^5.0.0",
     "ioredis": "^5.4.0"
   },

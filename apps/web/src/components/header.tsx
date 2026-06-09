@@ -1,6 +1,6 @@
 import { Server, LogIn } from 'lucide-react'
 import Link from 'next/link'
-import { getSession } from '@/lib/session'
+import { getActiveSession } from '@/lib/session'
 import { getCurrentUser } from '@forge-git/gitea-bridge'
 import SignOutButton from './sign-out-button'
 import ThemeToggle from './theme-toggle'
@@ -8,7 +8,7 @@ import SearchBar from './search-bar'
 import NotificationBell from './notification-bell'
 
 export default async function Header() {
-  const session = await getSession()
+  const session = await getActiveSession()
 
   let user: { login: string; avatar_url: string } | null = null
   if (session) {
