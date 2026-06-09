@@ -17,16 +17,36 @@ export default function RepoCard({ repo }: { repo: GiteaRepo }) {
   return (
     <div className="border border-border rounded-lg p-4 hover:border-ring transition-colors">
       <div className="flex items-start justify-between mb-2">
-        <Link
-          href={`/repositories/${repo.full_name}`}
-          className="font-medium text-primary hover:underline"
-        >
-          {repo.full_name}
-        </Link>
+        <div>
+          {repo.owner ? (
+            <div className="flex items-center gap-1 text-sm">
+              <Link
+                href={`/users/${repo.owner.login}`}
+                className="text-muted-foreground hover:text-foreground hover:underline"
+              >
+                {repo.owner.login}
+              </Link>
+              <span className="text-muted-foreground">/</span>
+              <Link
+                href={`/repositories/${repo.full_name}`}
+                className="font-medium text-primary hover:underline"
+              >
+                {repo.name}
+              </Link>
+            </div>
+          ) : (
+            <Link
+              href={`/repositories/${repo.full_name}`}
+              className="font-medium text-primary hover:underline"
+            >
+              {repo.full_name}
+            </Link>
+          )}
+        </div>
         {repo.private ? (
-          <Lock className="w-4 h-4 text-muted-foreground" />
+          <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
         ) : (
-          <Globe className="w-4 h-4 text-muted-foreground" />
+          <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
         )}
       </div>
 

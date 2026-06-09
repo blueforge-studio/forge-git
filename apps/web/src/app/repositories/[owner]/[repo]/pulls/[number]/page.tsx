@@ -1,10 +1,12 @@
 import { getSession } from '@/lib/session'
-import { getPullRequest } from '@forge-git/gitea-bridge'
+import { getPullRequest, listIssueComments } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import RepoSettingsNav from '@/components/repo-settings-nav'
 import PullRequestActions from './pr-actions'
-import { GitPullRequest, GitMerge } from 'lucide-react'
+import CommentList from '@/components/comment-list'
+import CommentForm from '@/components/comment-form'
+import { GitMerge } from 'lucide-react'
 
 interface Props {
   params: Promise<{ owner: string; repo: string; number: string }>
@@ -16,9 +18,12 @@ export default async function PullRequestDetailPage({ params }: Props) {
   const session = await getSession()
   if (!session) redirect('/login')
 
-  let pr
+  let pr, comments
   try {
-    pr = await getPullRequest(owner, repo, prNumber, session)
+    ;[pr, comments] = await Promise.all([
+      getPullRequest(owner, repo, prNumber, session),
+      listIssueComments(owner, repo, prNumber, session),
+    ])
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     if (msg.includes('404')) notFound()
@@ -109,6 +114,15 @@ export default async function PullRequestDetailPage({ params }: Props) {
             <dd className="text-sm">{new Date(pr.merged_at).toLocaleDateString()}</dd>
           </div>
         )}
+      </div>
+
+      {/* Comments */}
+      <div className="border border-border rounded-lg p-6 mt-6">
+        <h2 className="text-sm font-semibold mb-4">Comments</h2>
+        <div className="mb-6">
+          <CommentForm owner={owner} repo={repo} index={prNumber} />
+        </div>
+        <CommentList comments={comments} />
       </div>
     </main>
   )

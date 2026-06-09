@@ -1,9 +1,11 @@
 import { getSession } from '@/lib/session'
-import { getIssue } from '@forge-git/gitea-bridge'
+import { getIssue, listIssueComments } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import RepoSettingsNav from '@/components/repo-settings-nav'
 import IssueActions from './issue-actions'
+import CommentList from '@/components/comment-list'
+import CommentForm from '@/components/comment-form'
 
 interface Props {
   params: Promise<{ owner: string; repo: string; number: string }>
@@ -15,9 +17,12 @@ export default async function IssueDetailPage({ params }: Props) {
   const session = await getSession()
   if (!session) redirect('/login')
 
-  let issue
+  let issue, comments
   try {
-    issue = await getIssue(owner, repo, issueNumber, session)
+    ;[issue, comments] = await Promise.all([
+      getIssue(owner, repo, issueNumber, session),
+      listIssueComments(owner, repo, issueNumber, session),
+    ])
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     if (msg.includes('404')) notFound()
@@ -91,7 +96,7 @@ export default async function IssueDetailPage({ params }: Props) {
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 mb-6">
         <div className="border border-border rounded-lg p-4">
           <dt className="text-xs text-muted-foreground mb-1">State</dt>
           <dd className="text-sm capitalize">{issue.state}</dd>
@@ -108,6 +113,15 @@ export default async function IssueDetailPage({ params }: Props) {
           <dt className="text-xs text-muted-foreground mb-1">Updated</dt>
           <dd className="text-sm">{new Date(issue.updated_at).toLocaleDateString()}</dd>
         </div>
+      </div>
+
+      {/* Comments */}
+      <div className="border border-border rounded-lg p-6">
+        <h2 className="text-sm font-semibold mb-4">Comments</h2>
+        <div className="mb-6">
+          <CommentForm owner={owner} repo={repo} index={issueNumber} />
+        </div>
+        <CommentList comments={comments} />
       </div>
     </main>
   )

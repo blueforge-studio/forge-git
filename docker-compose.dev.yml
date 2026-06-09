@@ -1,0 +1,36 @@
+services:
+  web:
+    image: node:22-alpine
+    container_name: forge-git-web
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web:/app/apps/web
+      - ./packages:/app/packages
+      - ./pnpm-workspace.yaml:/app/pnpm-workspace.yaml
+      - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    command: >
+      sh -c "
+        npm install -g pnpm &&
+        pnpm -C apps/web dev
+      "
+    environment:
+      - GITEA_URL=http://gitea:3000
+      - REDIS_HOST=redis
+      - DATABASE_URL=postgres://forge-git:forge-git@postgres:5432/forge-git?schema=public
+    depends_on:
+      gitea:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_started
+
+networks:
+  default:
+    name: forge-git-network
+    driver: bridge

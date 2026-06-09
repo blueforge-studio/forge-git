@@ -66,6 +66,13 @@ export interface GiteaRepo {
   id: number
   name: string
   full_name: string
+  owner?: {
+    id: number
+    login: string
+    full_name?: string
+    email?: string
+    avatar_url: string
+  }
   description?: string
   private: boolean
   fork: boolean
@@ -223,6 +230,15 @@ export interface Issue {
   labels: Array<{ id: number; name: string; color: string }>
 }
 
+export interface Comment {
+  id: number
+  body: string
+  html_url: string
+  created_at: string
+  updated_at: string
+  user: { id: number; login: string; full_name?: string; avatar_url: string }
+}
+
 export interface Release {
   id: number
   tag_name: string
@@ -241,6 +257,13 @@ export interface Branch {
   name: string
   commit: { id: string; message: string }
   protected: boolean
+}
+
+export interface TreeEntry {
+  path: string
+  type: 'tree' | 'blob'
+  size: number
+  sha: string
 }
 
 export interface Commit {

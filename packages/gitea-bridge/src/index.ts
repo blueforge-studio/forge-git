@@ -33,6 +33,8 @@ export type {
   SearchResult,
   Notification,
   NotificationCount,
+  Comment,
+  TreeEntry,
 } from './types'
 
 // ─── User ───────────────────────────────────────────────────────────────────
@@ -132,6 +134,14 @@ export {
   markAllNotificationsRead,
 } from './notification'
 
+// ─── Comments ────────────────────────────────────────────────────────────────
+
+export {
+  listIssueComments,
+  createIssueComment,
+  deleteIssueComment,
+} from './comment'
+
 // ─── Webhooks ───────────────────────────────────────────────────────────────
 
 export {
@@ -139,3 +149,10 @@ export {
   createWebhook,
   deleteWebhook,
 } from './webhook'
+
+// ─── Tree / Blob ────────────────────────────────────────────────────────────
+
+export {
+  getTree,
+  getBlob,
+} from './tree'

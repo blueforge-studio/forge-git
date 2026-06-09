@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 const tabs = [
   { label: 'Overview', href: '' },
+  { label: 'Files', href: '/tree' },
   { label: 'Pull Requests', href: '/pulls' },
   { label: 'Issues', href: '/issues' },
   { label: 'Releases', href: '/releases' },
