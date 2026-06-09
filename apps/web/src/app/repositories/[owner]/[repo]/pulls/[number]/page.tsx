@@ -6,6 +6,7 @@ import RepoSettingsNav from '@/components/repo-settings-nav'
 import PullRequestActions from './pr-actions'
 import CommentList from '@/components/comment-list'
 import CommentForm from '@/components/comment-form'
+import PullReviewForm from '@/components/pull-review-form'
 import PullReviewList, { type PullReviewWithComments } from './pull-review-list'
 import { GitMerge } from 'lucide-react'
 
@@ -129,6 +130,14 @@ export default async function PullRequestDetailPage({ params }: Props) {
           </div>
         )}
       </div>
+
+      {/* Submit a review */}
+      {pr.state === 'open' && (
+        <section className="mt-6 border border-border rounded-lg p-6">
+          <h2 className="text-sm font-semibold mb-4">Submit a Review</h2>
+          <PullReviewForm owner={owner} repo={repo} prNumber={prNumber} />
+        </section>
+      )}
 
       {/* Reviews */}
       {reviews.length > 0 && (
