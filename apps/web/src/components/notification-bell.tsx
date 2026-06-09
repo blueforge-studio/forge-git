@@ -2,20 +2,27 @@
 
 import { Bell } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+
+async function fetchCount(): Promise<number> {
+  const res = await fetch('/api/notifications/count')
+  if (!res.ok) throw new Error('Failed to fetch')
+  const data = await res.json() as { count: number }
+  return data.count
+}
 
 export default function NotificationBell() {
   const [count, setCount] = useState(0)
 
-  useEffect(() => {
-    fetch('/api/notifications/count')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch')
-        return res.json() as Promise<{ count: number }>
-      })
-      .then((data) => setCount(data.count))
-      .catch(() => setCount(0))
+  const updateCount = useCallback(() => {
+    fetchCount().then(setCount).catch(() => setCount(0))
   }, [])
+
+  useEffect(() => {
+    updateCount()
+    const interval = setInterval(updateCount, 30_000)
+    return () => clearInterval(interval)
+  }, [updateCount])
 
   return (
     <Link

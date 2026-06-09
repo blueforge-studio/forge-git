@@ -1,11 +1,12 @@
 import { getSession } from '@/lib/session'
-import { getPullRequest, listIssueComments } from '@forge-git/gitea-bridge'
+import { getPullRequest, listIssueComments, listPullReviews, listPullReviewComments, type PullReviewComment } from '@forge-git/gitea-bridge'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import RepoSettingsNav from '@/components/repo-settings-nav'
 import PullRequestActions from './pr-actions'
 import CommentList from '@/components/comment-list'
 import CommentForm from '@/components/comment-form'
+import PullReviewList, { type PullReviewWithComments } from './pull-review-list'
 import { GitMerge } from 'lucide-react'
 
 interface Props {
@@ -19,11 +20,24 @@ export default async function PullRequestDetailPage({ params }: Props) {
   if (!session) redirect('/login')
 
   let pr, comments
+  let reviews: PullReviewWithComments[] = []
   try {
-    ;[pr, comments] = await Promise.all([
+    const [prResult, commentsResult, reviewsResult] = await Promise.all([
       getPullRequest(owner, repo, prNumber, session),
       listIssueComments(owner, repo, prNumber, session),
+      listPullReviews(owner, repo, prNumber, session),
     ])
+    pr = prResult
+    comments = commentsResult
+    // Fetch review comments in parallel for each review
+    if (reviewsResult.length > 0) {
+      const reviewComments = await Promise.all(
+        reviewsResult.map((r) =>
+          listPullReviewComments(owner, repo, prNumber, r.id, session).catch((): PullReviewComment[] => [])
+        )
+      )
+      reviews = reviewsResult.map((r, i) => ({ ...r, inlineComments: reviewComments[i] ?? [] }))
+    }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     if (msg.includes('404')) notFound()
@@ -116,13 +130,21 @@ export default async function PullRequestDetailPage({ params }: Props) {
         )}
       </div>
 
+      {/* Reviews */}
+      {reviews.length > 0 && (
+        <section className="mt-6">
+          <h2 className="text-sm font-semibold mb-4">Reviews</h2>
+          <PullReviewList reviews={reviews} />
+        </section>
+      )}
+
       {/* Comments */}
       <div className="border border-border rounded-lg p-6 mt-6">
         <h2 className="text-sm font-semibold mb-4">Comments</h2>
         <div className="mb-6">
           <CommentForm owner={owner} repo={repo} index={prNumber} />
         </div>
-        <CommentList comments={comments} />
+        <CommentList comments={comments} owner={owner} repo={repo} />
       </div>
     </main>
   )

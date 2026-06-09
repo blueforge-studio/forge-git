@@ -121,7 +121,7 @@ export default async function IssueDetailPage({ params }: Props) {
         <div className="mb-6">
           <CommentForm owner={owner} repo={repo} index={issueNumber} />
         </div>
-        <CommentList comments={comments} />
+        <CommentList comments={comments} owner={owner} repo={repo} />
       </div>
     </main>
   )

@@ -1,9 +1,16 @@
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import CommentList from '@/components/comment-list'
 import type { Comment } from '@forge-git/gitea-bridge'
 
-afterEach(() => cleanup())
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+}))
+
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+})
 
 const mockComments: Comment[] = [
   {
@@ -26,7 +33,7 @@ const mockComments: Comment[] = [
 
 describe('CommentList', () => {
   it('renders comments with author names and bodies', () => {
-    render(<CommentList comments={mockComments} />)
+    render(<CommentList comments={mockComments} owner="acme" repo="repo" />)
 
     expect(screen.getByText('Octo Cat')).toBeInTheDocument()
     expect(screen.getByText('botuser')).toBeInTheDocument()
@@ -35,7 +42,7 @@ describe('CommentList', () => {
   })
 
   it('renders empty state when no comments', () => {
-    render(<CommentList comments={[]} />)
+    render(<CommentList comments={[]} owner="acme" repo="repo" />)
 
     expect(screen.getByText('No comments yet.')).toBeInTheDocument()
   })
