@@ -1,0 +1,61 @@
+# Gitea Actions Runner
+#
+# Register this runner with your Gitea instance, then start it:
+#
+#   1. Get a registration token from:
+#      Gitea → Site Admin → Actions → Runners → Create new runner
+#
+#   2. Export the token and instance URL:
+#      export GITEA_RUNNER_TOKEN=<token>
+#      export GITEA_INSTANCE_URL=http://gitea:3000
+#
+#   3. Start the runner:
+#      docker compose -f .gitea/runner/docker-compose.runner.yml up -d
+#
+# The runner will appear in your Gitea instance and start picking up jobs.
+
+services:
+  runner:
+    image: gitea/act_runner:latest
+    container_name: forge-git-runner
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - runner-data:/data
+    environment:
+      - GITEA_INSTANCE_URL=${GITEA_INSTANCE_URL:-http://gitea:3000}
+      - GITEA_RUNNER_REGISTRATION_TOKEN=${GITEA_RUNNER_TOKEN}
+      - GITEA_RUNNER_NAME=forge-git-runner
+      - GITEA_RUNNER_LABELS=ubuntu-latest,linux,self-hosted
+    networks:
+      - default
+
+  # Register the runner on first start (one-shot container)
+  runner-register:
+    image: gitea/act_runner:latest
+    depends_on:
+      - runner
+    entrypoint: >
+      sh -c "
+        gitea-actions-runner register
+        --no-interactive
+        --instance '$${GITEA_INSTANCE_URL}'
+        --token '$${GITEA_RUNNER_TOKEN}'
+        --name 'forge-git-runner'
+        --labels 'ubuntu-latest,linux,self-hosted'
+      "
+    environment:
+      - GITEA_INSTANCE_URL=${GITEA_INSTANCE_URL:-http://gitea:3000}
+      - GITEA_RUNNER_TOKEN=${GITEA_RUNNER_TOKEN}
+    volumes:
+      - runner-data:/data
+    networks:
+      - default
+
+volumes:
+  runner-data:
+
+networks:
+  default:
+    name: forge-git-network
+    external: true

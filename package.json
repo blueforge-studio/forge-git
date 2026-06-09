@@ -10,6 +10,7 @@
     "infra:up:full": "docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile full up -d",
     "infra:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
     "test": "turbo run test",
+    "test:e2e": "pnpm --filter @forge-git/web test:e2e",
     "build": "turbo run build"
   },
   "devDependencies": {

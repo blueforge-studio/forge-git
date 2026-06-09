@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
-  pull_request:
+  pull_request_target:
     branches: [main]
 
 jobs:
@@ -25,7 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -49,25 +48,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build gitea-bridge
-        run: pnpm -C packages/gitea-bridge build
-
-      - name: Build deploy-runner
-        run: pnpm -C packages/deploy-runner build
-
-      - name: Build CLI
-        run: pnpm -C packages/cli build
-
-      - name: Build UI
-        run: pnpm -C packages/ui build
-
-      - name: Build web app
-        run: pnpm -C apps/web build
+      - name: Build all packages
+        run: |
+          pnpm -C packages/gitea-bridge build
+          pnpm -C packages/deploy-runner build
+          pnpm -C packages/cli build
+          pnpm -C packages/ui build
+          pnpm -C apps/web build
 
   e2e:
     runs-on: ubuntu-latest
@@ -85,7 +76,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
