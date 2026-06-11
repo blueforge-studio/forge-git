@@ -13,15 +13,9 @@ test.describe('Search pages', () => {
     expect(page.url()).toContain('/login')
   })
 
-  test('search bar visible on landing page and focuses with / key', async ({ page }) => {
+  test('search bar is not visible on unauthenticated landing page', async ({ page }) => {
     await page.goto('/')
-    // Search bar should be visible
-    const searchInput = page.locator('input[placeholder*="Search"]').or(page.locator('input[name="q"]'))
-    // Press / to focus the search input
-    await page.keyboard.press('/')
-    // The input should be focused (no textarea/input should have been focused beforehand)
-    // Verify the search component rendered
-    await expect(page.locator('input[placeholder*="Search"]').or(page.locator('input[name="q"]'))).toBeVisible()
+    await expect(page.locator('input[placeholder*="Search"]').or(page.locator('input[name="q"]'))).not.toBeVisible()
   })
 
   test('search API requires authentication', async ({ page }) => {

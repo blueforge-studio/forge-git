@@ -14,7 +14,7 @@ interface QuickResult {
 
 let debounceTimer: ReturnType<typeof setTimeout>
 
-export default function SearchBar() {
+export default function SearchBar({ placeholder = 'Search... (press "/")' }: { placeholder?: string }) {
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -103,7 +103,7 @@ export default function SearchBar() {
         <Input
           ref={inputRef}
           type="search"
-          placeholder='Search... (press "/")'
+          placeholder={placeholder}
           value={query}
           onChange={(e) => handleChange(e.target.value)}
           onFocus={() => { if (results && hasResults) setOpen(true) }}

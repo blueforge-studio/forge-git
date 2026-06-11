@@ -3,24 +3,25 @@ import { test, expect } from '@playwright/test'
 test.describe('Dashboard (landing page)', () => {
   test('unauthenticated landing shows feature grid and sign in', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('text=forge-git')).toBeVisible()
-    await expect(page.locator('text=Sign in to get started')).toBeVisible()
-    await expect(page.locator('text=Git Hosting')).toBeVisible()
-    await expect(page.locator('text=CI/CD Pipeline')).toBeVisible()
-    await expect(page.locator('text=Team Management')).toBeVisible()
+    await expect(page.getByTestId('hero-section')).toBeVisible()
+    await expect(page.getByTestId('hero-sign-in-cta')).toBeVisible()
+    await expect(page.getByTestId('feature-grid')).toBeVisible()
+    await expect(page.getByTestId('pricing-section')).toBeVisible()
+    await expect(page.getByTestId('cta-section')).toBeVisible()
   })
 
   test('unauthenticated landing has sign in link', async ({ page }) => {
     await page.goto('/')
-    await page.locator('text=Sign in to get started').click()
+    await page.getByTestId('hero-sign-in-cta').click()
     await page.waitForURL('**/login**')
     expect(page.url()).toContain('/login')
   })
 
   test('landing page shows footer attribution', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('text=Powered by Gitea')).toBeVisible()
-    await expect(page.locator('text=Open Source')).toBeVisible()
+    const footer = page.getByTestId('site-footer')
+    await expect(footer).toBeVisible()
+    await expect(footer.getByText(/Gitea/).first()).toBeVisible()
   })
 })
 

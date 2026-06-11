@@ -1,8 +1,13 @@
 import Link from 'next/link'
 import { Button } from '@forge-git/ui'
-import { Server, LogIn, GitPullRequest, AlertCircle, Box } from 'lucide-react'
-import { FolderGit2 } from 'lucide-react'
+import { Server, GitPullRequest, AlertCircle, Box, FolderGit2 } from 'lucide-react'
+import HeroSection from '@/components/landing/hero-section'
 import FeatureGrid from '@/components/feature-grid'
+import HowItWorksSection from '@/components/landing/how-it-works-section'
+import PricingSection from '@/components/landing/pricing-section'
+import NewsletterSection from '@/components/landing/newsletter-section'
+import CtaSection from '@/components/landing/cta-section'
+import AppFooter from '@/components/footer'
 import DashboardStats from '@/components/dashboard-stats'
 import DashboardSections from '@/components/dashboard-sections'
 import { getActiveSession } from '@/lib/session'
@@ -13,30 +18,19 @@ export default async function HomePage() {
 
   if (!session) {
     return (
-      <main className="max-w-5xl mx-auto px-6 py-10">
-        <div className="mb-10 text-center">
-          <h1 className="text-3xl font-semibold mb-3">forge-git</h1>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            Self-hosted Git platform with CI/CD, team management, and preview deployments.
-          </p>
-          <div className="mt-6">
-            <Button asChild size="lg">
-              <Link href="/login">
-                <LogIn className="w-4 h-4" />
-                Sign in to get started
-              </Link>
-            </Button>
-          </div>
+      <>
+        <HeroSection />
+
+        <div className="max-w-5xl mx-auto px-6">
+          <FeatureGrid />
+          <HowItWorksSection />
+          <PricingSection />
+          <NewsletterSection />
+          <CtaSection />
         </div>
 
-        <FeatureGrid />
-
-        <div className="text-center mt-8">
-          <p className="text-xs text-muted-foreground">
-            Powered by Gitea &bull; Self-hosted &bull; Open Source
-          </p>
-        </div>
-      </main>
+        <AppFooter />
+      </>
     )
   }
 

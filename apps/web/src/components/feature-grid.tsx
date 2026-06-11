@@ -1,52 +1,47 @@
+import { getTranslations } from 'next-intl/server'
 import { Server, Play, Users, GitPullRequest, CircleDot, Package } from 'lucide-react'
-import Link from 'next/link'
 
-const features = [
-  {
-    icon: Server,
-    title: 'Git Hosting',
-    description: 'Host repositories with full Git support, branch protection, deploy keys, and webhooks — powered by Gitea.',
-  },
-  {
-    icon: GitPullRequest,
-    title: 'Pull Requests',
-    description: 'Create, review, and merge pull requests. Close and reopen PRs with a clean, fast interface.',
-  },
-  {
-    icon: CircleDot,
-    title: 'Issue Tracking',
-    description: 'Track bugs and feature requests. Create, close, and reopen issues with full markdown support.',
-  },
-  {
-    icon: Package,
-    title: 'Release Management',
-    description: 'Publish releases with release notes, track versions, and manage your software delivery pipeline.',
-  },
-  {
-    icon: Play,
-    title: 'CI/CD Pipeline',
-    description: 'Trigger builds, track deployments, and manage your CI/CD workflow with our integrated build system.',
-  },
-  {
-    icon: Users,
-    title: 'Team Management',
-    description: 'Create organizations, manage teams, and control access with fine-grained permissions.',
-  },
-]
+const featureKeys = [
+  { icon: Server, key: 'gitHosting' },
+  { icon: GitPullRequest, key: 'pullRequests' },
+  { icon: CircleDot, key: 'issueTracking' },
+  { icon: Package, key: 'releaseManagement' },
+  { icon: Play, key: 'cicdPipeline' },
+  { icon: Users, key: 'teamManagement' },
+] as const
 
-export default function FeatureGrid() {
+export default async function FeatureGrid() {
+  const t = await getTranslations('features')
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-10">
-      {features.map(({ icon: Icon, title, description }) => (
-        <div
-          key={title}
-          className="border border-border rounded-lg p-6 hover:bg-secondary/20 transition-colors"
+    <section aria-labelledby="features-heading" data-testid="feature-grid" className="pt-8">
+      <div className="text-center mb-10">
+        <h2
+          id="features-heading"
+          className="text-2xl font-semibold tracking-tight mb-3"
         >
-          <Icon className="w-8 h-8 mb-3 text-primary" />
-          <h3 className="font-semibold text-sm mb-2">{title}</h3>
-          <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
+          {t('heading')}
+        </h2>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">
+          {t('subtitle')}
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-10">
+      {featureKeys.map(({ icon: Icon, key }) => (
+        <div
+          key={key}
+          className="group glass-card p-6"
+          data-testid={`feature-card-${key}`}
+        >
+          <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary mb-4 group-hover:bg-primary/15 transition-colors">
+            <Icon className="w-5 h-5" />
+          </div>
+          <h3 className="font-semibold text-sm mb-2 text-foreground dark:text-white">{t(`${key}.title`)}</h3>
+          <p className="text-xs text-muted-foreground leading-relaxed">{t(`${key}.description`)}</p>
         </div>
       ))}
     </div>
+    </section>
   )
 }

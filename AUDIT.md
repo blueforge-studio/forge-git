@@ -21,7 +21,7 @@
 
 ### Web App — Routes (38 total)
 
-**Public:** `/` (landing/dashboard), `/login` (OAuth + PAT), `/search`
+**Public:** `/` (landing/dashboard, i18n-aware with en/es/zh locales), `/login` (OAuth + PAT), `/search`
 
 **Builds:** `/builds`, `/builds/[id]` — queue list, detail with live SSE log streaming, trigger form, retry/cancel
 
@@ -39,13 +39,13 @@
 
 `/api/auth/authorize`, `/api/auth/callback`, `/api/auth/signout`, `/api/builds/trigger`, `/api/builds/[id]` (PATCH/DELETE), `/api/builds/[id]/logs` (SSE), `/api/notifications/count`, `/api/comments`, `/api/webhooks/gitea`
 
-### Web App — Components (34)
+### Web App — Components (37)
 
-Header, search, theme toggle, notification bell, repo cards/lists, build cards/list/log viewer/log streamer/artifact list/polling/status badge, job timestamps, dashboard stats/sections, trigger build form, empty state, feature grid, org/team forms and sidebars, create repo form, profile display, comment form/list, notification card, connection info
+Header, search, theme toggle, notification bell, repo cards/lists, build cards/list/log viewer/log streamer/artifact list/polling/status badge, job timestamps, dashboard stats/sections, trigger build form, empty state, feature grid, org/team forms and sidebars, create repo form, profile display, comment form/list, notification card, connection info, footer, locale selector, landing sections (hero, CTA, how-it-works, pricing, newsletter)
 
 ### Web App — Lib (8)
 
-session (HMAC-signed OAuth + PAT), queue (BullMQ), minio (S3 presigned URLs), oauth-config, pkce (Web Crypto), build-utils, dashboard-data, notification-utils
+session (HMAC-signed OAuth + PAT), queue (BullMQ), minio (S3 presigned URLs), oauth-config, pkce (Web Crypto), build-utils, dashboard-data, notification-utils, i18n (next-intl v4 — request config, routing, middleware)
 
 ### Infrastructure
 
@@ -60,7 +60,7 @@ session (HMAC-signed OAuth + PAT), queue (BullMQ), minio (S3 presigned URLs), oa
 
 - **gitea-bridge**: 11 unit test files (all modules covered, mock fetch)
 - **deploy-runner**: 1 test (lifecycle)
-- **apps/web**: 10 unit/component tests + 11 Playwright E2E specs
+- **apps/web**: 31 unit/component test files (183 tests) + 15 Playwright E2E specs (69 tests)
 - **CLI**: 0 tests
 - **UI**: 0 tests
 

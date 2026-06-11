@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+const mockMigrate = vi.fn()
+
 // Mock pg Pool
-const mockQuery = vi.fn()
 vi.mock('pg', () => ({
   Pool: vi.fn().mockImplementation(() => ({
-    query: mockQuery,
+    query: vi.fn(),
   })),
 }))
 
@@ -13,35 +14,35 @@ vi.mock('drizzle-orm/node-postgres', () => ({
   drizzle: vi.fn(() => ({})),
 }))
 
+// Mock the migrator sub-path used by runMigrations
+vi.mock('drizzle-orm/node-postgres/migrator', () => ({
+  migrate: mockMigrate,
+}))
+
 describe('runMigrations', () => {
   beforeEach(() => {
     vi.resetModules()
-    mockQuery.mockReset()
+    mockMigrate.mockReset()
   })
 
   it('runs migrations only once', async () => {
     const { runMigrations } = await import('@/lib/db')
-    mockQuery.mockResolvedValueOnce({ rows: [] })
 
     await runMigrations()
     await runMigrations()
 
-    expect(mockQuery).toHaveBeenCalledTimes(1)
+    expect(mockMigrate).toHaveBeenCalledTimes(1)
   })
 
-  it('creates all required tables', async () => {
+  it('calls migrate with db instance and migrations folder', async () => {
     const { runMigrations } = await import('@/lib/db')
-    mockQuery.mockResolvedValueOnce({ rows: [] })
 
     await runMigrations()
 
-    const sql: string = mockQuery.mock.calls[0][0]
-    expect(sql).toContain('CREATE TABLE IF NOT EXISTS forge_users')
-    expect(sql).toContain('CREATE TABLE IF NOT EXISTS forge_orgs')
-    expect(sql).toContain('CREATE TABLE IF NOT EXISTS forge_members')
-    expect(sql).toContain('CREATE TABLE IF NOT EXISTS forge_previews')
-    expect(sql).toContain('CREATE TABLE IF NOT EXISTS error_groups')
-    expect(sql).toContain('CREATE TABLE IF NOT EXISTS error_events')
+    expect(mockMigrate).toHaveBeenCalledWith(
+      expect.anything(),
+      { migrationsFolder: './drizzle' },
+    )
   })
 })
 

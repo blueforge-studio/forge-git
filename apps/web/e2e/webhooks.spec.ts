@@ -63,11 +63,11 @@ test.describe('Webhook API receiver', () => {
     expect(response.status()).toBe(200)
   })
 
-  test('webhook receiver returns 200 with missing signature header', async ({ page }) => {
+  test('webhook receiver returns 400 when missing event type header', async ({ page }) => {
     const response = await page.request.post('/api/webhooks/gitea', {
       headers: { 'Content-Type': 'application/json' },
       data: { ref: 'refs/heads/main' },
     })
-    expect(response.status()).toBe(200)
+    expect(response.status()).toBe(400)
   })
 })

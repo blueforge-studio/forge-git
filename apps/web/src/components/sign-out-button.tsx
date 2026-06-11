@@ -3,7 +3,7 @@
 import { LogOut } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-export default function SignOutButton() {
+export default function SignOutButton({ label }: { label: string }) {
   const router = useRouter()
 
   return (
@@ -16,7 +16,7 @@ export default function SignOutButton() {
       className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
     >
       <LogOut className="w-4 h-4" />
-      Sign out
+      {label}
     </button>
   )
 }

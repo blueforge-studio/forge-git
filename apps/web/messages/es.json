@@ -1,0 +1,169 @@
+{
+  "hero": {
+    "pillBadge": "Plataforma Git autogestionada impulsada por Gitea",
+    "heading1": "Alojamiento Git",
+    "heading2": "a tu manera",
+    "subtitle": "Una interfaz moderna y CI/CD potente sobre tu propia instancia de Gitea. Aloja repositorios, gestiona pull requests, sigue incidencias y despliega previews — todo en tu infraestructura.",
+    "signInCta": "Inicia sesión para empezar",
+    "howItWorksCta": "Cómo funciona",
+    "statSelfHosted": "Autogestionado",
+    "statSelfHostedDetail": "Tu infraestructura, tus datos",
+    "statOpenSource": "Código abierto",
+    "statOpenSourceDetail": "Impulsado por Gitea",
+    "statCicd": "CI/CD integrado",
+    "statCicdDetail": "Compila, prueba, despliega"
+  },
+  "features": {
+    "heading": "Características",
+    "subtitle": "Todo lo que necesitas para alojar, revisar y enviar código en tu propia infraestructura.",
+    "gitHosting": {
+      "title": "Alojamiento Git",
+      "description": "Aloja repositorios con soporte Git completo, protección de ramas, claves de despliegue y webhooks — impulsado por Gitea."
+    },
+    "pullRequests": {
+      "title": "Pull Requests",
+      "description": "Crea, revisa y fusiona pull requests. Cierra y reabre PRs con una interfaz limpia y rápida."
+    },
+    "issueTracking": {
+      "title": "Seguimiento de Incidencias",
+      "description": "Rastrea errores y solicitudes de funciones. Crea, cierra y reabre incidencias con soporte completo de markdown."
+    },
+    "releaseManagement": {
+      "title": "Gestión de Versiones",
+      "description": "Publica versiones con notas de lanzamiento, sigue las versiones y gestiona tu pipeline de entrega de software."
+    },
+    "cicdPipeline": {
+      "title": "Pipeline CI/CD",
+      "description": "Lanza compilaciones, sigue despliegues y gestiona tu flujo de trabajo CI/CD con nuestro sistema integrado."
+    },
+    "teamManagement": {
+      "title": "Gestión de Equipos",
+      "description": "Crea organizaciones, gestiona equipos y controla el acceso con permisos detallados."
+    }
+  },
+  "howItWorks": {
+    "heading": "Cómo funciona",
+    "subtitle": "Tres pasos para un mejor flujo de trabajo Git en tu propia infraestructura.",
+    "step1": {
+      "title": "Conecta Gitea",
+      "description": "Vincula tu instancia autogestionada de Gitea en segundos. Forge git se sitúa sobre Gitea, ofreciéndote una interfaz moderna y CI/CD potente sin migrar tus repos."
+    },
+    "step2": {
+      "title": "Crea y Colabora",
+      "description": "Crea repositorios, gestiona organizaciones y equipos, revisa pull requests y sigue incidencias — todo desde una interfaz limpia y rápida que a tu equipo le encantará."
+    },
+    "step3": {
+      "title": "Compila y Despliega",
+      "description": "Lanza compilaciones, monitoriza pipelines CI/CD y despliega entornos de preview automáticamente. Envía más rápido con herramientas de compilación integradas."
+    }
+  },
+  "pricing": {
+    "heading": "Precios simples y transparentes",
+    "subtitle": "Autogestionado en tu infraestructura. Sin cargos ocultos, sin facturas sorpresa.",
+    "mostPopular": "Más popular",
+    "free": {
+      "name": "Gratis",
+      "price": "$0",
+      "description": "Autogestionado con soporte comunitario. Perfecto para individuos y equipos pequeños.",
+      "feature0": "Repositorios ilimitados",
+      "feature1": "Pull requests y revisión de código",
+      "feature2": "Seguimiento de incidencias",
+      "feature3": "Pipelines CI/CD básicos",
+      "feature4": "Soporte comunitario",
+      "feature5": "",
+      "period": "",
+      "cta": "Comienza ahora"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "$12",
+      "period": "/mes",
+      "description": "Funciones avanzadas para equipos en crecimiento que envían a gran velocidad.",
+      "cta": "Prueba gratuita",
+      "feature0": "Todo lo de Gratis",
+      "feature1": "Colas de compilación prioritarias",
+      "feature2": "Despliegues de preview",
+      "feature3": "Gestión de equipos y RBAC",
+      "feature4": "Configuraciones CI/CD avanzadas",
+      "feature5": "Soporte por email"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "price": "Personalizado",
+      "description": "Infraestructura dedicada y soporte para grandes organizaciones.",
+      "cta": "Contacta con ventas",
+      "feature0": "Todo lo de Pro",
+      "feature1": "Opciones de despliegue personalizadas",
+      "feature2": "Integración SSO y SAML",
+      "feature3": "Registros de auditoría y cumplimiento",
+      "feature4": "Soporte dedicado",
+      "feature5": "99.9% SLA"
+    }
+  },
+  "newsletter": {
+    "heading": "Mantente al día",
+    "description": "Recibe actualizaciones del producto, consejos para Git autogestionado y acceso anticipado a nuevas funciones.",
+    "success": "¡Gracias por suscribirte!",
+    "placeholder": "tu@ejemplo.com",
+    "submit": "Suscribirse",
+    "errorGeneric": "Algo salió mal",
+    "errorFailed": "Error al suscribirse"
+  },
+  "cta": {
+    "heading": "¿Listo para enviar más rápido?",
+    "description": "Autogestiona tu flujo de trabajo Git con las herramientas que tu equipo necesita — pull requests, incidencias, CI/CD y más.",
+    "button": "Comienza gratis"
+  },
+  "footer": {
+    "brandName": "Forge git",
+    "brandDescription": "Plataforma Git autogestionada impulsada por Gitea. Aloja repositorios, gestiona pull requests y despliega previews — todo en tu infraestructura.",
+    "githubLink": "GitHub",
+    "platform": {
+      "heading": "Plataforma",
+      "repositories": "Repositorios",
+      "organizations": "Organizaciones",
+      "builds": "Compilaciones",
+      "signIn": "Iniciar sesión"
+    },
+    "resources": {
+      "heading": "Recursos",
+      "giteaDocs": "Documentación Gitea",
+      "aboutGitea": "Acerca de Gitea",
+      "github": "GitHub"
+    },
+    "legal": {
+      "heading": "Legal",
+      "privacy": "Privacidad",
+      "terms": "Términos",
+      "contact": "Contacto"
+    },
+    "newsletter": {
+      "heading": "Mantente al día",
+      "placeholder": "tu@ejemplo.com",
+      "submit": "Suscribirse"
+    },
+    "copyright": "{year} Forge git. Todos los derechos reservados.",
+    "by": "por",
+    "studioName": "BlueForge Studio"
+  },
+  "header": {
+    "brandName": "Forge git",
+    "nav": {
+      "repositories": "Repositorios",
+      "organizations": "Organizaciones",
+      "builds": "Compilaciones"
+    },
+    "userMenu": {
+      "profile": "Perfil",
+      "settings": "Ajustes",
+      "signOut": "Cerrar sesión",
+      "user": "Usuario"
+    },
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión",
+    "searchPlaceholder": "Buscar… (presiona \"/\")"
+  },
+  "locale": {
+    "selectLanguage": "Seleccionar idioma: {label}"
+  }
+}

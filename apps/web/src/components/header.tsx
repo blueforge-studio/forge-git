@@ -1,16 +1,21 @@
-import { Server, LogIn } from 'lucide-react'
+import { LogIn } from 'lucide-react'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
+import { UserMenu } from '@blueforge-studio/app-kit'
+import type { UserMenuItem } from '@blueforge-studio/app-kit'
 import { getActiveSession } from '@/lib/session'
 import { getCurrentUser } from '@forge-git/gitea-bridge'
 import SignOutButton from './sign-out-button'
 import ThemeToggle from './theme-toggle'
 import SearchBar from './search-bar'
 import NotificationBell from './notification-bell'
+import LocaleSelector from './locale-selector'
 
 export default async function Header() {
+  const t = await getTranslations('header')
   const session = await getActiveSession()
 
-  let user: { login: string; avatar_url: string } | null = null
+  let user: { login: string; avatar_url: string; email?: string } | null = null
   if (session) {
     try {
       user = await getCurrentUser(session)
@@ -19,56 +24,79 @@ export default async function Header() {
     }
   }
 
+  const userMenuItems: UserMenuItem[] = user
+    ? [
+        { label: t('userMenu.profile'), href: `/profile/${user.login}` },
+        { label: t('userMenu.settings'), href: '/settings' },
+        { label: '', divider: true },
+        { label: t('userMenu.signOut'), onClick: () => {}, disabled: true },
+      ]
+    : []
+
   return (
-    <header className="border-b border-border">
+    <header className="border-b border-border" data-testid="site-header">
       <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Server className="w-5 h-5" />
-          <Link href="/" className="font-semibold hover:text-primary">
-            forge-git
+        <div className="flex items-center gap-2.5">
+          <img
+            src="/images/logo-mark.webp"
+            alt={t('brandName')}
+            width={24}
+            height={24}
+            className="rounded"
+          />
+          <Link href="/" className="font-semibold transition-colors hover:text-primary" data-testid="brand-link">
+            {t('brandName')}
           </Link>
         </div>
 
-        <nav className="flex items-center gap-6 text-sm">
+        <nav className="flex items-center gap-5 text-sm">
           {session ? (
             <>
-              <Link href="/repositories" className="hover:text-primary">
-                Repositories
+              <Link href="/repositories" className="transition-colors hover:text-primary">
+                {t('nav.repositories')}
               </Link>
-              <Link href="/organizations" className="hover:text-primary">
-                Organizations
+              <Link href="/organizations" className="transition-colors hover:text-primary">
+                {t('nav.organizations')}
               </Link>
-              <Link href="/builds" className="hover:text-primary">
-                Builds
+              <Link href="/builds" className="transition-colors hover:text-primary">
+                {t('nav.builds')}
               </Link>
-              <SearchBar />
-              <Link href="/settings" className="hover:text-primary">
-                Settings
-              </Link>
+              <SearchBar placeholder={t('searchPlaceholder')} />
               <NotificationBell />
-              {user && (
-                <span className="flex items-center gap-2 text-muted-foreground">
-                  {user.avatar_url && (
+              <UserMenu
+                name={user?.login ?? t('userMenu.user')}
+                email={user?.email ?? undefined}
+                avatar={
+                  user?.avatar_url ? (
                     <img
                       src={user.avatar_url}
                       alt={user.login}
-                      className="w-5 h-5 rounded-full"
+                      className="w-7 h-7 rounded-full ring-1 ring-border"
                     />
-                  )}
-                  {user.login}
-                </span>
-              )}
-              <ThemeToggle />
-              <SignOutButton />
+                  ) : undefined
+                }
+                items={userMenuItems}
+              />
+              <LocaleSelector />
+              <div data-testid="theme-toggle">
+                <ThemeToggle />
+              </div>
+              <SignOutButton label={t('signOut')} />
             </>
           ) : (
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-1 hover:text-primary"
-            >
-              <LogIn className="w-4 h-4" />
-              Sign in
-            </Link>
+            <>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-1 transition-colors hover:text-primary"
+              >
+                <LogIn className="w-4 h-4" />
+                {t('signIn')}
+              </Link>
+              <LocaleSelector />
+              <div data-testid="theme-toggle">
+                <ThemeToggle />
+              </div>
+            </>
           )}
         </nav>
       </div>

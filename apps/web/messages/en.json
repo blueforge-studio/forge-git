@@ -1,0 +1,169 @@
+{
+  "hero": {
+    "pillBadge": "Self-hosted Git platform powered by Gitea",
+    "heading1": "Git hosting",
+    "heading2": "on your terms",
+    "subtitle": "A modern UI and powerful CI/CD on top of your own Gitea instance. Host repositories, manage pull requests, track issues, and deploy previews — all on your infrastructure.",
+    "signInCta": "Sign in to get started",
+    "howItWorksCta": "How it works",
+    "statSelfHosted": "Self-hosted",
+    "statSelfHostedDetail": "Your infrastructure, your data",
+    "statOpenSource": "Open source",
+    "statOpenSourceDetail": "Powered by Gitea",
+    "statCicd": "CI/CD built-in",
+    "statCicdDetail": "Build, test, deploy"
+  },
+  "features": {
+    "heading": "Features",
+    "subtitle": "Everything you need to host, review, and ship code on your own infrastructure.",
+    "gitHosting": {
+      "title": "Git Hosting",
+      "description": "Host repositories with full Git support, branch protection, deploy keys, and webhooks — powered by Gitea."
+    },
+    "pullRequests": {
+      "title": "Pull Requests",
+      "description": "Create, review, and merge pull requests. Close and reopen PRs with a clean, fast interface."
+    },
+    "issueTracking": {
+      "title": "Issue Tracking",
+      "description": "Track bugs and feature requests. Create, close, and reopen issues with full markdown support."
+    },
+    "releaseManagement": {
+      "title": "Release Management",
+      "description": "Publish releases with release notes, track versions, and manage your software delivery pipeline."
+    },
+    "cicdPipeline": {
+      "title": "CI/CD Pipeline",
+      "description": "Trigger builds, track deployments, and manage your CI/CD workflow with our integrated build system."
+    },
+    "teamManagement": {
+      "title": "Team Management",
+      "description": "Create organizations, manage teams, and control access with fine-grained permissions."
+    }
+  },
+  "howItWorks": {
+    "heading": "How it works",
+    "subtitle": "Three steps to a better Git workflow on your own infrastructure.",
+    "step1": {
+      "title": "Connect Gitea",
+      "description": "Link your self-hosted Gitea instance in seconds. Forge git sits on top of Gitea, giving you a modern UI and powerful CI/CD without migrating your repos."
+    },
+    "step2": {
+      "title": "Create & Collaborate",
+      "description": "Create repositories, manage organizations and teams, review pull requests, and track issues — all from a clean, fast interface your team will love."
+    },
+    "step3": {
+      "title": "Build & Deploy",
+      "description": "Trigger builds, monitor CI/CD pipelines, and deploy preview environments automatically. Ship faster with integrated build tooling."
+    }
+  },
+  "pricing": {
+    "heading": "Simple, transparent pricing",
+    "subtitle": "Self-hosted on your infrastructure. No hidden fees, no surprise bills.",
+    "mostPopular": "Most popular",
+    "free": {
+      "name": "Free",
+      "price": "$0",
+      "description": "Self-hosted with community support. Perfect for individuals and small teams.",
+      "feature0": "Unlimited repositories",
+      "feature1": "Pull requests & code review",
+      "feature2": "Issue tracking",
+      "feature3": "Basic CI/CD pipelines",
+      "feature4": "Community support",
+      "feature5": "",
+      "period": "",
+      "cta": "Get started"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "$12",
+      "period": "/month",
+      "description": "Advanced features for growing teams shipping at speed.",
+      "feature0": "Everything in Free",
+      "feature1": "Priority build queues",
+      "feature2": "Preview deployments",
+      "feature3": "Team management & RBAC",
+      "feature4": "Advanced CI/CD configs",
+      "feature5": "Email support",
+      "cta": "Start free trial"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "price": "Custom",
+      "description": "Dedicated infrastructure and support for large organizations.",
+      "feature0": "Everything in Pro",
+      "feature1": "Custom deployment options",
+      "feature2": "SSO & SAML integration",
+      "feature3": "Audit logs & compliance",
+      "feature4": "Dedicated support",
+      "feature5": "99.9% SLA",
+      "cta": "Contact sales"
+    }
+  },
+  "newsletter": {
+    "heading": "Stay in the loop",
+    "description": "Get product updates, tips for self-hosted Git, and early access to new features.",
+    "success": "Thanks for subscribing!",
+    "placeholder": "you@example.com",
+    "submit": "Subscribe",
+    "errorGeneric": "Something went wrong",
+    "errorFailed": "Failed to subscribe"
+  },
+  "cta": {
+    "heading": "Ready to ship faster?",
+    "description": "Self-host your Git workflow with the tools your team needs — pull requests, issues, CI/CD, and more.",
+    "button": "Get started for free"
+  },
+  "footer": {
+    "brandName": "Forge git",
+    "brandDescription": "Self-hosted Git platform powered by Gitea. Host repositories, manage pull requests, and deploy previews — all on your infrastructure.",
+    "githubLink": "GitHub",
+    "platform": {
+      "heading": "Platform",
+      "repositories": "Repositories",
+      "organizations": "Organizations",
+      "builds": "Builds",
+      "signIn": "Sign in"
+    },
+    "resources": {
+      "heading": "Resources",
+      "giteaDocs": "Gitea Docs",
+      "aboutGitea": "About Gitea",
+      "github": "GitHub"
+    },
+    "legal": {
+      "heading": "Legal",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "contact": "Contact"
+    },
+    "newsletter": {
+      "heading": "Stay up to date",
+      "placeholder": "you@example.com",
+      "submit": "Subscribe"
+    },
+    "copyright": "{year} Forge git. All rights reserved.",
+    "by": "by",
+    "studioName": "BlueForge Studio"
+  },
+  "header": {
+    "brandName": "Forge git",
+    "nav": {
+      "repositories": "Repositories",
+      "organizations": "Organizations",
+      "builds": "Builds"
+    },
+    "userMenu": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "signOut": "Sign Out",
+      "user": "User"
+    },
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "searchPlaceholder": "Search… (press \"/\")"
+  },
+  "locale": {
+    "selectLanguage": "Select language: {label}"
+  }
+}

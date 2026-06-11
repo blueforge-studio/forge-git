@@ -10,7 +10,18 @@ vi.mock('@forge-git/gitea-bridge', () => ({
   getCurrentUser: vi.fn(),
 }))
 
-vi.mock('next/navigation', () => ({}))
+vi.mock('@blueforge-studio/app-kit', () => ({
+  UserMenu: ({ name, avatar, items }: any) => (
+    <div data-testid="user-menu">
+      {avatar}
+      <span>{name}</span>
+      {items?.map((item: any, i: number) => (
+        item.divider ? <hr key={i} /> : <a key={i} href={item.href}>{item.label}</a>
+      ))}
+    </div>
+  ),
+}))
+
 vi.mock('next/link', () => ({
   default: ({ href, children, ...props }: any) => (
     <a href={href} {...props}>{children}</a>
@@ -48,38 +59,38 @@ describe('Header', () => {
   it('renders forge-git branding', async () => {
     vi.mocked(getActiveSession).mockResolvedValue(null)
 
-    render(await Header({}))
+    render(await Header())
 
-    expect(screen.getByText('forge-git')).toBeInTheDocument()
+    expect(screen.getByText('brandName')).toBeInTheDocument()
   })
 
   it('shows sign in link when unauthenticated', async () => {
     vi.mocked(getActiveSession).mockResolvedValue(null)
 
-    render(await Header({}))
+    render(await Header())
 
-    expect(screen.getByText('Sign in')).toBeInTheDocument()
-    expect(screen.queryByText('Repositories')).not.toBeInTheDocument()
-    expect(screen.queryByText('Builds')).not.toBeInTheDocument()
+    expect(screen.getByText('signIn')).toBeInTheDocument()
+    expect(screen.queryByText('nav.repositories')).not.toBeInTheDocument()
+    expect(screen.queryByText('nav.organizations')).not.toBeInTheDocument()
   })
 
   it('shows nav links when authenticated', async () => {
     vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
     vi.mocked(getCurrentUser).mockResolvedValue({ login: 'octocat', avatar_url: '' })
 
-    render(await Header({}))
+    render(await Header())
 
-    expect(screen.getByText('Repositories')).toBeInTheDocument()
-    expect(screen.getByText('Organizations')).toBeInTheDocument()
-    expect(screen.getByText('Builds')).toBeInTheDocument()
-    expect(screen.getByText('Settings')).toBeInTheDocument()
+    expect(screen.getByText('nav.repositories')).toBeInTheDocument()
+    expect(screen.getByText('nav.organizations')).toBeInTheDocument()
+    expect(screen.getByText('nav.builds')).toBeInTheDocument()
+    expect(screen.getByText('userMenu.settings')).toBeInTheDocument()
   })
 
   it('shows username when user data loads', async () => {
     vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
     vi.mocked(getCurrentUser).mockResolvedValue({ login: 'octocat', avatar_url: '' })
 
-    render(await Header({}))
+    render(await Header())
 
     expect(screen.getByText('octocat')).toBeInTheDocument()
   })
@@ -88,7 +99,7 @@ describe('Header', () => {
     vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
     vi.mocked(getCurrentUser).mockResolvedValue({ login: 'octocat', avatar_url: 'https://example.com/avatar.png' })
 
-    render(await Header({}))
+    render(await Header())
 
     const avatar = screen.getByAltText('octocat')
     expect(avatar).toBeInTheDocument()
@@ -99,7 +110,7 @@ describe('Header', () => {
     vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
     vi.mocked(getCurrentUser).mockResolvedValue({ login: 'octocat', avatar_url: '' })
 
-    render(await Header({}))
+    render(await Header())
 
     expect(screen.getByText('Sign out')).toBeInTheDocument()
     expect(screen.getByText('Toggle theme')).toBeInTheDocument()
@@ -109,10 +120,10 @@ describe('Header', () => {
     vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
     vi.mocked(getCurrentUser).mockRejectedValue(new Error('Token expired'))
 
-    render(await Header({}))
+    render(await Header())
 
     // Nav should still render, but no username
-    expect(screen.getByText('Repositories')).toBeInTheDocument()
+    expect(screen.getByText('nav.repositories')).toBeInTheDocument()
     expect(screen.queryByText('octocat')).not.toBeInTheDocument()
   })
 
@@ -120,9 +131,9 @@ describe('Header', () => {
     vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
     vi.mocked(getCurrentUser).mockResolvedValue({ login: 'octocat', avatar_url: '' })
 
-    render(await Header({}))
+    render(await Header())
 
-    expect(screen.getByText('Repositories').closest('a')).toHaveAttribute('href', '/repositories')
-    expect(screen.getByText('Builds').closest('a')).toHaveAttribute('href', '/builds')
+    expect(screen.getByText('nav.repositories').closest('a')).toHaveAttribute('href', '/repositories')
+    expect(screen.getByText('nav.builds').closest('a')).toHaveAttribute('href', '/builds')
   })
 })

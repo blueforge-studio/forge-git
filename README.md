@@ -15,11 +15,12 @@ Self-hosted Git platform — Gitea-powered Git hosting with CI/CD, pull requests
 - **Organizations** — Create orgs, manage teams and members
 - **CI/CD Pipeline** — Trigger builds, track queued/running/completed/failed jobs
 - **Dark Mode** — Light/dark theme with system preference detection
+- **Internationalization** — Multi-locale support (English, Spanish, Chinese) via next-intl
 
 ## Stack
 
 - **Gitea** — Git hosting, web UI, user management
-- **Next.js 16** — Web UI (React 19, Tailwind 4, Turbopack)
+- **Next.js 16** — Web UI (React 19, Tailwind 4, Turbopack, next-intl)
 - **BullMQ + Redis** — CI/CD job queue
 - **Docker** — Isolated build workers
 - **MinIO** — Build artifacts + cache storage

@@ -1,47 +1,91 @@
 @import "tailwindcss";
 
+@source "../../node_modules/@blueforge-studio/marketing-kit/dist/**/*.js";
+@source "../../node_modules/@blueforge-studio/app-kit/dist/**/*.js";
+@variant dark (&:where(.dark, .dark *));
+
 @theme inline {
-  --color-border: hsl(214.3 31.8% 91.4%);
-  --color-input: hsl(214.3 31.8% 91.4%);
-  --color-ring: hsl(222.2 84% 60.3%);
+  --color-border: hsl(217 20% 85%);
+  --color-input: hsl(217 20% 85%);
+  --color-ring: hsl(217 91% 60%);
   --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(222.2 84% 4.9%);
-  --color-primary: hsl(222.2 47.4% 11.2%);
-  --color-primary-foreground: hsl(210 40% 98%);
-  --color-secondary: hsl(210 40% 96.1%);
-  --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
-  --color-destructive: hsl(0 84.2% 60.2%);
-  --color-destructive-foreground: hsl(210 40% 98%);
-  --color-muted: hsl(210 40% 96.1%);
-  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
-  --color-accent: hsl(210 40% 96.1%);
-  --color-accent-foreground: hsl(222.2 47.4% 11.2%);
+  --color-foreground: hsl(217 30% 12%);
+
+  --color-primary: hsl(217 91% 56%);
+  --color-primary-foreground: hsl(0 0% 100%);
+
+  --color-secondary: hsl(271 81% 56%);
+  --color-secondary-foreground: hsl(0 0% 100%);
+
+  --color-accent: hsl(199 89% 48%);
+  --color-accent-foreground: hsl(0 0% 100%);
+
+  --color-success: hsl(152 76% 40%);
+  --color-success-foreground: hsl(0 0% 100%);
+
+  --color-warning: hsl(32 95% 44%);
+  --color-warning-foreground: hsl(0 0% 100%);
+
+  --color-info: hsl(199 89% 48%);
+  --color-info-foreground: hsl(0 0% 100%);
+
+  --color-destructive: hsl(0 84% 60%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+
+  --color-muted: hsl(217 20% 96%);
+  --color-muted-foreground: hsl(217 12% 46%);
+
   --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(222.2 84% 4.9%);
+  --color-popover-foreground: hsl(217 30% 12%);
+
   --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(222.2 84% 4.9%);
+  --color-card-foreground: hsl(217 30% 12%);
+
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-up: slide-up 0.5s ease-out;
+  --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 20px -8px hsl(217 91% 56% / 0.3); }
+    50% { box-shadow: 0 0 32px -4px hsl(217 91% 56% / 0.5); }
+  }
 }
 
 .dark {
-  --color-border: hsl(217.2 32.6% 17.5%);
-  --color-input: hsl(217.2 32.6% 17.5%);
-  --color-ring: hsl(224.3 76.3% 48%);
-  --color-background: hsl(222.2 84% 4.9%);
-  --color-foreground: hsl(210 40% 98%);
-  --color-primary: hsl(210 40% 98%);
-  --color-primary-foreground: hsl(222.2 47.4% 11.2%);
-  --color-secondary: hsl(217.2 32.6% 17.5%);
-  --color-secondary-foreground: hsl(210 40% 98%);
-  --color-destructive: hsl(0 62.8% 50.6%);
-  --color-destructive-foreground: hsl(210 40% 98%);
-  --color-muted: hsl(217.2 32.6% 17.5%);
-  --color-muted-foreground: hsl(215 20.2% 65.1%);
-  --color-accent: hsl(217.2 32.6% 17.5%);
-  --color-accent-foreground: hsl(210 40% 98%);
-  --color-popover: hsl(222.2 84% 4.9%);
-  --color-popover-foreground: hsl(210 40% 98%);
-  --color-card: hsl(222.2 84% 4.9%);
-  --color-card-foreground: hsl(210 40% 98%);
+  --color-border: hsl(217 18% 22%);
+  --color-input: hsl(217 18% 22%);
+  --color-ring: hsl(217 91% 64%);
+  --color-background: hsl(217 25% 7%);
+  --color-foreground: hsl(217 20% 92%);
+
+  --color-primary: hsl(217 91% 64%);
+  --color-primary-foreground: hsl(0 0% 100%);
+
+  --color-secondary: hsl(271 81% 64%);
+  --color-secondary-foreground: hsl(0 0% 100%);
+
+  --color-destructive: hsl(0 72% 51%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+
+  --color-muted: hsl(217 18% 14%);
+  --color-muted-foreground: hsl(217 12% 60%);
+
+  --color-accent: hsl(199 89% 52%);
+  --color-accent-foreground: hsl(0 0% 100%);
+
+  --color-popover: hsl(217 25% 10%);
+  --color-popover-foreground: hsl(217 20% 92%);
+
+  --color-card: hsl(217 25% 10%);
+  --color-card-foreground: hsl(217 20% 92%);
 }
 
 body {
@@ -51,4 +95,65 @@ body {
 
 *, *::before, *::after {
   border-color: var(--color-border);
+}
+
+/* Ambient background orbs for landing page */
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(217 91% 56%), hsl(271 81% 56%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .gradient-text {
+  background: linear-gradient(135deg, hsl(217 91% 64%), hsl(271 81% 64%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card hover glow */
+.card-glow {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-glow:hover {
+  box-shadow: 0 0 24px -4px hsl(217 91% 56% / 0.15);
+  border-color: hsl(217 91% 56% / 0.3);
+}
+
+/* Glass card — semi-transparent surface with blur */
+.glass-card {
+  background: color-mix(in oklab, var(--color-card) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: 1.25rem;
+  transition: all 0.25s ease;
+}
+.glass-card:hover {
+  border-color: color-mix(in oklab, var(--color-primary) 35%, transparent);
+  box-shadow: 0 0 24px color-mix(in oklab, var(--color-primary) 25%, transparent);
+}
+
+/* Button glow — gradient with lift effect */
+.btn-glow {
+  background: linear-gradient(135deg, var(--color-primary), #4338ca);
+  color: white;
+  font-weight: 600;
+  border-radius: 1rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px color-mix(in oklab, var(--color-primary) 40%, transparent);
+}
+.btn-glow:hover {
+  box-shadow: 0 6px 25px color-mix(in oklab, var(--color-primary) 60%, transparent);
+  transform: translateY(-2px);
 }

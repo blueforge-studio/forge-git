@@ -1,0 +1,170 @@
+{
+  "hero": {
+    "pillBadge": "由 Gitea 提供支持的自托管 Git 平台",
+    "heading1": "Git 托管",
+    "heading2": "由你掌控",
+    "subtitle": "在你自己的 Gitea 实例上获得现代化界面和强大的 CI/CD。托管仓库、管理 Pull Request、跟踪问题、部署预览——全部在你自己的基础设施上。",
+    "signInCta": "登录开始使用",
+    "howItWorksCta": "工作原理",
+    "statSelfHosted": "自托管",
+    "statSelfHostedDetail": "你的基础设施，你的数据",
+    "statOpenSource": "开源",
+    "statOpenSourceDetail": "由 Gitea 提供支持",
+    "statCicd": "内置 CI/CD",
+    "statCicdDetail": "构建、测试、部署"
+  },
+  "features": {
+    "heading": "功能特性",
+    "subtitle": "在你自己的基础设施上托管、审查和交付代码所需的一切。",
+    "gitHosting": {
+      "title": "Git 托管",
+      "description": "托管仓库，支持完整的 Git 功能、分支保护、部署密钥和 Webhook——由 Gitea 提供支持。"
+    },
+    "pullRequests": {
+      "title": "Pull Request",
+      "description": "创建、审查和合并 Pull Request。通过简洁快速的界面关闭和重新打开 PR。"
+    },
+    "issueTracking": {
+      "title": "问题跟踪",
+      "description": "跟踪 Bug 和功能请求。创建、关闭和重新打开问题，支持完整的 Markdown 格式。"
+    },
+    "releaseManagement": {
+      "title": "版本管理",
+      "description": "发布带有 Release Notes 的版本，跟踪版本变化，管理软件交付流程。"
+    },
+    "cicdPipeline": {
+      "title": "CI/CD 流水线",
+      "description": "触发构建、跟踪部署，通过我们的集成构建系统管理 CI/CD 工作流。"
+    },
+    "teamManagement": {
+      "title": "团队管理",
+      "description": "创建组织、管理团队，通过细粒度权限控制访问。"
+    }
+  },
+  "howItWorks": {
+    "heading": "工作原理",
+    "subtitle": "三步实现更好的 Git 工作流，运行在你自己的基础设施上。",
+    "step1": {
+      "title": "连接 Gitea",
+      "description": "几秒钟内连接你的自托管 Gitea 实例。Forge git 位于 Gitea 之上，为你提供现代化界面和强大的 CI/CD，无需迁移仓库。"
+    },
+    "step2": {
+      "title": "创建与协作",
+      "description": "创建仓库、管理组织和团队、审查 Pull Request、跟踪问题——一切都在你的团队会喜欢的简洁快速界面中完成。"
+    },
+    "step3": {
+      "title": "构建与部署",
+      "description": "触发构建、监控 CI/CD 流水线，自动部署预览环境。使用集成的构建工具更快交付。"
+    }
+  },
+  "pricing": {
+    "heading": "简单透明的定价",
+    "subtitle": "在你自己的基础设施上自托管。没有隐藏费用，没有意外账单。",
+    "mostPopular": "最受欢迎",
+    "free": {
+      "name": "免费",
+      "price": "$0",
+      "description": "自托管，享受社区支持。非常适合个人和小团队。",
+      "cta": "开始使用",
+      "feature0": "无限仓库",
+      "feature1": "Pull Request 和代码审查",
+      "feature2": "问题跟踪",
+      "feature3": "基础 CI/CD 流水线",
+      "feature4": "社区支持",
+      "feature5": "",
+      "period": "",
+      "cta": "开始使用"
+    },
+    "pro": {
+      "name": "专业版",
+      "price": "$12",
+      "period": "/月",
+      "description": "为快速交付的成长型团队提供高级功能。",
+      "cta": "免费试用",
+      "feature0": "免费版全部功能",
+      "feature1": "优先构建队列",
+      "feature2": "预览部署",
+      "feature3": "团队管理和 RBAC",
+      "feature4": "高级 CI/CD 配置",
+      "feature5": "邮件支持"
+    },
+    "enterprise": {
+      "name": "企业版",
+      "price": "定制",
+      "description": "为大型组织提供专属基础设施和支持。",
+      "cta": "联系销售",
+      "feature0": "专业版全部功能",
+      "feature1": "定制部署选项",
+      "feature2": "SSO 和 SAML 集成",
+      "feature3": "审计日志与合规",
+      "feature4": "专属支持",
+      "feature5": "99.9% SLA"
+    }
+  },
+  "newsletter": {
+    "heading": "保持联系",
+    "description": "获取产品更新、自托管 Git 技巧以及新功能的早期访问。",
+    "success": "感谢订阅！",
+    "placeholder": "you@example.com",
+    "submit": "订阅",
+    "errorGeneric": "出了点问题",
+    "errorFailed": "订阅失败"
+  },
+  "cta": {
+    "heading": "准备好更快交付了吗？",
+    "description": "自托管你的 Git 工作流，使用团队所需的所有工具——Pull Request、问题跟踪、CI/CD 等等。",
+    "button": "免费开始使用"
+  },
+  "footer": {
+    "brandName": "Forge git",
+    "brandDescription": "由 Gitea 提供支持的自托管 Git 平台。托管仓库、管理 Pull Request 和部署预览——全部在你自己的基础设施上。",
+    "githubLink": "GitHub",
+    "platform": {
+      "heading": "平台",
+      "repositories": "仓库",
+      "organizations": "组织",
+      "builds": "构建",
+      "signIn": "登录"
+    },
+    "resources": {
+      "heading": "资源",
+      "giteaDocs": "Gitea 文档",
+      "aboutGitea": "关于 Gitea",
+      "github": "GitHub"
+    },
+    "legal": {
+      "heading": "法律",
+      "privacy": "隐私政策",
+      "terms": "服务条款",
+      "contact": "联系我们"
+    },
+    "newsletter": {
+      "heading": "保持联系",
+      "placeholder": "you@example.com",
+      "submit": "订阅"
+    },
+    "copyright": "{year} Forge git. 保留所有权利。",
+    "by": "由",
+    "studioName": "BlueForge Studio"
+  },
+  "header": {
+    "brandName": "Forge git",
+    "nav": {
+      "repositories": "仓库",
+      "organizations": "组织",
+      "builds": "构建"
+    },
+    "userMenu": {
+      "profile": "个人资料",
+      "settings": "设置",
+      "signOut": "退出登录",
+      "user": "用户"
+    },
+    "signIn": "登录",
+    "signOut": "退出登录",
+    "searchPlaceholder": "搜索…（按 \"/\"）"
+  },
+  "locale": {
+    "selectLanguage": "选择语言：{label}"
+  }
+}
