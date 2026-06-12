@@ -4,7 +4,7 @@ export function AuthShell({
   tagline,
   children,
 }: {
-  tagline: string
+  tagline?: string
   children: React.ReactNode
 }) {
   return (
