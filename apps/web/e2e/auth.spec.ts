@@ -102,6 +102,40 @@ test.describe('Unauthenticated pages', () => {
     await expect(page.getByText(/create a personal access token/i)).toBeVisible()
     await expect(page.getByRole('link', { name: /sign in/i }).last()).toBeVisible()
   })
+
+  test('forgot-token page shows empty state without localStorage', async ({ page }) => {
+    await page.goto('/forgot-token')
+    await expect(page.getByRole('heading', { name: /forgot your gitea url/i })).toBeVisible()
+    await expect(page.getByText(/nothing saved on this device/i)).toBeVisible()
+    await expect(page.getByText(/check the email invite/i)).toBeVisible()
+    await expect(page.getByText(/ask a teammate/i)).toBeVisible()
+    await expect(page.getByText(/search your browser history/i)).toBeVisible()
+    await expect(page.getByText(/check your team's wiki/i)).toBeVisible()
+  })
+
+  test('forgot-token page shows remembered URL with localStorage', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('forge-git:last-gitea-url', 'https://git.example.com')
+    })
+    await page.goto('/forgot-token')
+    await expect(page.getByRole('heading', { name: /forgot your gitea url/i })).toBeVisible()
+    await expect(page.getByText(/we saved this from a previous sign-in/i)).toBeVisible()
+    await expect(page.getByText('https://git.example.com')).toBeVisible()
+    await expect(page.getByTestId('copy-code-button')).toBeVisible()
+  })
+
+  test('forgot-token page copy button works', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await page.addInitScript(() => {
+      window.localStorage.setItem('forge-git:last-gitea-url', 'https://git.example.com')
+    })
+    await page.goto('/forgot-token')
+    const copyButton = page.getByTestId('copy-code-button')
+    await copyButton.click()
+    await expect(copyButton).toContainText(/copied/i)
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText())
+    expect(clipboardText).toBe('https://git.example.com')
+  })
 })
 
 test.describe('Navigation', () => {
