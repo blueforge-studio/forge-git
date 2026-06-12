@@ -66,7 +66,7 @@ const server = http.createServer((req, res) => {
   }
 
   // ─── Repositories ────────────────────────────────────────────────
-  if (path === '/api/v1/user/repos' || path === '/api/v1/users/testuser/repos') {
+  if (path === '/api/v1/user/repos' || path === '/api/v1/users/me/repos' || path === '/api/v1/users/testuser/repos') {
     if (auth === `Bearer ${EMPTY_REPOS_TOKEN}`) {
       return json(res, 200, [])
     }

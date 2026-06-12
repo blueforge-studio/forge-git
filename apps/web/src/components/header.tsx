@@ -29,7 +29,6 @@ export default async function Header() {
         { label: t('userMenu.profile'), href: `/profile/${user.login}` },
         { label: t('userMenu.settings'), href: '/settings' },
         { label: '', divider: true },
-        { label: t('userMenu.signOut'), onClick: () => {}, disabled: true },
       ]
     : []
 
