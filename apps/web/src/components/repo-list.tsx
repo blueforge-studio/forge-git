@@ -1,8 +1,7 @@
 import { listUserRepos } from '@forge-git/gitea-bridge'
 import type { Session } from '@/lib/session'
 import RepoCard from './repo-card'
-import EmptyState from './empty-state'
-import { Server } from 'lucide-react'
+import { FirstRunEmptyState } from './first-run-empty-state'
 
 export default async function RepoList({ session }: { session: Session }) {
   let repos
@@ -21,15 +20,7 @@ export default async function RepoList({ session }: { session: Session }) {
   }
 
   if (repos.length === 0) {
-    return (
-      <EmptyState
-        icon={Server}
-        title="No repositories yet"
-        description="Create your first repository to start hosting with forge-git"
-        actionLabel="Create Repository"
-        actionHref="/repositories/new"
-      />
-    )
+    return <FirstRunEmptyState />
   }
 
   return (
