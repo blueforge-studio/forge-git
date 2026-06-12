@@ -9,10 +9,10 @@ test.describe('OAuth login page', () => {
 
   test('login page has PAT form in details element', async ({ page }) => {
     await page.goto('/login')
-    await expect(page.locator('text=Manual token')).toBeVisible()
+    await expect(page.locator('summary', { hasText: 'Use a personal access token' })).toBeVisible()
 
     // PAT form is hidden until details is expanded
-    const details = page.locator('details')
+    const details = page.locator('details').filter({ has: page.locator('input[name="giteaUrl"]') })
     await expect(details.locator('input[name="giteaUrl"]')).not.toBeVisible()
 
     // Open the details element
@@ -38,7 +38,9 @@ test.describe('OAuth login page', () => {
 
   test('login page shows OAuth setup instructions', async ({ page }) => {
     await page.goto('/login')
-    await expect(page.locator('text=Setting up OAuth')).toBeVisible()
+    const summary = page.locator('summary', { hasText: 'Setting up OAuth' })
+    await expect(summary).toBeVisible()
+    await summary.click()
     await expect(page.locator('text=Register a new application')).toBeVisible()
   })
 })
