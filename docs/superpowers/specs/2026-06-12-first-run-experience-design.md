@@ -225,7 +225,7 @@ add a different empty state for, e.g., "all repos filtered out".
 
 ## Testing
 
-### E2E tests (add to `apps/web/e2e/repositories.spec.ts`)
+### E2E tests (add to `apps/web/e2e/authenticated/repositories.spec.ts`)
 
 ```ts
 test('first-run empty state shows all 4 actions', async ({ page }) => {
@@ -253,10 +253,14 @@ test('learn more card opens in new tab', async ({ page }) => {
 })
 ```
 
-The first test depends on the Gitea mock returning 0 repos. Check
-the existing test patterns in `repositories.spec.ts` to see how the
-test fixture handles this — likely an `addInitScript` that overrides
-`fetch` for the Gitea API, or a dedicated test seed.
+The first test depends on the test Gitea backend (mock at
+`localhost:3099` per `e2e/auth.setup.ts`) returning 0 repos. The
+existing authenticated test fixture seeds an arbitrary mock-user
+state; the test plan will need to either (a) configure the mock to
+return 0 repos for a dedicated "empty" test user, (b) use Playwright
+`page.route()` to intercept and mock the Gitea `/repos/search` API
+response, or (c) accept the test runs against whatever the current
+mock state is. The implementation plan will pick one.
 
 ### i18n smoke test (add to `repositories.spec.ts` or `auth.spec.ts`)
 
@@ -294,10 +298,11 @@ auth-helper-pages spec's `AuthShell` component.)
 |---|---|---|
 | `apps/web/src/components/first-run-empty-state.tsx` | **NEW** | +~60 |
 | `apps/web/src/components/repo-list.tsx` | **MODIFY** (1 branch swap, 2 import removals) | -8 / +2 |
-| `apps/web/messages/en.json` | **MODIFY** (add `repositories.firstRun.*` namespace) | +9 |
-| `apps/web/messages/es.json` | **MODIFY** (same, English placeholders) | +9 |
-| `apps/web/messages/zh.json` | **MODIFY** (same, English placeholders) | +9 |
-| `apps/web/e2e/repositories.spec.ts` | **MODIFY** (3 new tests + 1 locale smoke) | +~40 |
+| `apps/web/messages/en.json` | **MODIFY** (add `repositories.firstRun.*` namespace) | +~11 |
+| `apps/web/messages/es.json` | **MODIFY** (same, English placeholders) | +~11 |
+| `apps/web/messages/zh.json` | **MODIFY** (same, English placeholders) | +~11 |
+| `apps/web/e2e/authenticated/repositories.spec.ts` | **MODIFY** (3 new tests) | +~30 |
+| `apps/web/e2e/repositories.spec.ts` (or `auth.spec.ts`) | **MODIFY** (1 locale smoke test) | +~10 |
 
 ## What's NOT in scope
 
