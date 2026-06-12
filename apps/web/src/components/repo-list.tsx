@@ -47,14 +47,14 @@ export default async function RepoList({ session }: { session: Session }) {
           <>
             <SecondaryCard
               href="/organizations/new"
-              icon={Users}
+              icon={<Users className="w-5 h-5" />}
               title={t('secondaryOrgTitle')}
               description={t('secondaryOrgDesc')}
               testId="first-run-secondary-org"
             />
             <SecondaryCard
               href="https://docs.gitea.com/user/using-git/"
-              icon={BookOpen}
+              icon={<BookOpen className="w-5 h-5" />}
               title={t('secondaryLearnTitle')}
               description={t('secondaryLearnDesc')}
               testId="first-run-secondary-learn"

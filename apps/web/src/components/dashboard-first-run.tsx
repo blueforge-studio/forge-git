@@ -28,14 +28,14 @@ export default async function DashboardFirstRun() {
         <>
           <SecondaryCard
             href="/organizations/new"
-            icon={Users}
+            icon={<Users className="w-5 h-5" />}
             title={t('secondaryOrgTitle')}
             description={t('secondaryOrgDesc')}
             testId="dashboard-first-run-secondary-org"
           />
           <SecondaryCard
             href="https://docs.gitea.com/user/using-git/"
-            icon={BookOpen}
+            icon={<BookOpen className="w-5 h-5" />}
             title={t('secondaryLearnTitle')}
             description={t('secondaryLearnDesc')}
             testId="dashboard-first-run-secondary-learn"

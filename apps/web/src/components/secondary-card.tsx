@@ -1,11 +1,9 @@
-'use client'
-
-import type { LucideIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 import Link from 'next/link'
 
 export interface SecondaryCardProps {
   href: string
-  icon: LucideIcon
+  icon: ReactNode
   title: string
   description: string
   testId: string
@@ -14,7 +12,7 @@ export interface SecondaryCardProps {
 
 export default function SecondaryCard({
   href,
-  icon: Icon,
+  icon,
   title,
   description,
   testId,
@@ -24,7 +22,9 @@ export default function SecondaryCard({
     'flex items-start gap-3 p-5 rounded-lg border border-border hover:border-primary/40 hover:bg-muted/30 transition-colors text-left'
   const content = (
     <>
-      <Icon className="w-5 h-5 mt-0.5 shrink-0 text-muted-foreground" aria-hidden={true} />
+      <span className="w-5 h-5 mt-0.5 shrink-0 text-muted-foreground" aria-hidden={true}>
+        {icon}
+      </span>
       <div className="min-w-0">
         <div className="text-sm font-medium text-foreground">{title}</div>
         <div className="text-xs text-muted-foreground mt-0.5">{description}</div>

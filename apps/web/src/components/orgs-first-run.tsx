@@ -54,7 +54,7 @@ export default function OrgsFirstRun({ labels }: { labels: OrgsFirstRunLabels })
       <div className="grid gap-3 sm:grid-cols-2 mt-4">
         <SecondaryCard
           href="https://docs.gitea.com/user/organizations/"
-          icon={BookOpen}
+          icon={<BookOpen className="w-5 h-5" />}
           title={labels.secondaryLearnTitle}
           description={labels.secondaryLearnDesc}
           testId="orgs-first-run-secondary-learn"

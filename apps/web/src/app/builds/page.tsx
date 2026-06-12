@@ -71,7 +71,7 @@ async function BuildsFirstRun() {
         <>
           <SecondaryCard
             href="https://docs.gitea.com/usage/actions/overview"
-            icon={BookOpen}
+            icon={<BookOpen className="w-5 h-5" />}
             title={t('secondaryLearnTitle')}
             description={t('secondaryLearnDesc')}
             testId="builds-first-run-secondary-learn"
@@ -79,7 +79,7 @@ async function BuildsFirstRun() {
           />
           <SecondaryCard
             href="/repositories"
-            icon={GitBranch}
+            icon={<GitBranch className="w-5 h-5" />}
             title={t('secondaryBrowseTitle')}
             description={t('secondaryBrowseDesc')}
             testId="builds-first-run-secondary-browse"
