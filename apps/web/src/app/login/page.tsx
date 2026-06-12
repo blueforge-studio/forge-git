@@ -2,7 +2,7 @@
 
 import { useActionState, Suspense, useEffect, useState, useCallback } from 'react'
 import { login } from './actions'
-import { Server, LogIn, ChevronRight, Key, AlertCircle } from 'lucide-react'
+import { LogIn, ChevronRight, Key, AlertCircle, Clipboard, Check } from 'lucide-react'
 import { Button, cn } from '@forge-git/ui'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -242,33 +242,56 @@ export default function LoginPage() {
               </form>
             </details>
 
-            <div className="text-xs text-muted-foreground space-y-1 border-t border-border mt-5 pt-4">
-              <p className="font-medium">Setting up OAuth</p>
-              <ol className="list-decimal list-inside space-y-1">
+            <details className="text-xs text-muted-foreground border-t border-border mt-5 pt-4 group">
+              <summary className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
+                <ChevronRight className="w-4 h-4 transition-transform group-open:rotate-90" />
+                {t('setupHelpSummary')}
+              </summary>
+              <ol className="list-decimal list-inside space-y-1 mt-3 pl-1">
+                <li>{t('setupHelpStep1')}</li>
                 <li>
-                  Go to your Gitea instance → Site Administration → Applications → OAuth2 Applications
+                  {t('setupHelpStep2')} <CodeBlock code={t('setupHelpRedirect')} />
                 </li>
+                <li>{t('setupHelpStep3')}</li>
                 <li>
-                  Register a new application with redirect URI:{' '}
-                  <code className="bg-muted px-1 py-0.5 rounded text-[10px]">
-                    /api/auth/callback
-                  </code>
-                </li>
-                <li>
-                  Set the environment variables{' '}
-                  <code className="bg-muted px-1 py-0.5 rounded text-[10px]">GITEA_OAUTH_CLIENT_ID</code>
-                  {' '}and{' '}
-                  <code className="bg-muted px-1 py-0.5 rounded text-[10px]">GITEA_OAUTH_CLIENT_SECRET</code>
-                </li>
-                <li>
-                  Or use the CLI:{' '}
-                  <code className="bg-muted px-1 py-0.5 rounded text-[10px]">fgit token setup-oauth</code>
+                  {t('setupHelpStep4')} <CodeBlock code={t('setupHelpCli')} />
                 </li>
               </ol>
-            </div>
+            </details>
           </div>
         </div>
       </Suspense>
     </main>
+  )
+}
+
+function CodeBlock({ code }: { code: string }) {
+  const t = useTranslations('login')
+  const [copied, setCopied] = useState(false)
+
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      // clipboard blocked — ignore
+    }
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1">
+      <code className="bg-muted px-1 py-0.5 rounded text-[10px]">{code}</code>
+      <button
+        type="button"
+        onClick={onCopy}
+        data-testid="copy-code-button"
+        aria-label={t('copyCode')}
+        className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-foreground"
+      >
+        {copied ? <Check className="w-3 h-3" /> : <Clipboard className="w-3 h-3" />}
+        {copied ? t('copyCodeCopied') : t('copyCode')}
+      </button>
+    </span>
   )
 }
