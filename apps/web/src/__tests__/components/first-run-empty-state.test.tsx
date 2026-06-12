@@ -60,6 +60,7 @@ describe('FirstRunEmptyState (generalized)', () => {
       ),
     })
     render(jsx)
+    expect(screen.getByTestId('secondary-grid')).toBeInTheDocument()
     expect(screen.getByTestId('secondary-1')).toBeInTheDocument()
     expect(screen.getByTestId('secondary-2')).toBeInTheDocument()
   })
@@ -70,7 +71,7 @@ describe('FirstRunEmptyState (generalized)', () => {
       namespace: 'builds.firstRun',
       primaryCta: <a href="/repositories">Go to repositories</a>,
     })
-    const { container } = render(jsx)
-    expect(container.querySelector('.sm\\:grid-cols-2')).toBeNull()
+    render(jsx)
+    expect(screen.queryByTestId('secondary-grid')).toBeNull()
   })
 })

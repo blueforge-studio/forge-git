@@ -25,7 +25,9 @@ export default async function FirstRunEmptyState({
       <p className="text-sm text-muted-foreground mb-6">{t('subhead')}</p>
       {primaryCta}
       {secondaryCards && (
-        <div className="grid gap-3 sm:grid-cols-2 mt-4">{secondaryCards}</div>
+        <div className="grid gap-3 sm:grid-cols-2 mt-4" data-testid="secondary-grid">
+          {secondaryCards}
+        </div>
       )}
     </div>
   )
