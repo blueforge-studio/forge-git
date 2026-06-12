@@ -166,5 +166,47 @@
   },
   "locale": {
     "selectLanguage": "选择语言：{label}"
+  },
+  "login": {
+    "tagline": "Self-hosted Git forge CI/CD. One click from your Gitea instance.",
+    "headline": "Welcome back",
+    "subhead": "Sign in to your forge-git account",
+    "oauthButton": "Sign in with Gitea",
+    "oauthHint": "One-click sign in. Requires OAuth2 configured in your Gitea instance.",
+    "orUsePat": "Or use a personal access token",
+    "patSummary": "Use a personal access token",
+    "giteaUrlPlaceholder": "https://forge-git.blueforge.studio",
+    "tokenPlaceholder": "Paste your token",
+    "tokenHint": "Generate one at your Gitea user settings → Applications",
+    "submitPat": "Sign in with PAT",
+    "submitting": "Signing in...",
+    "newHereGetToken": "New here? Get a token →",
+    "lastUsedHint": "Last used",
+    "urlInvalid": "Use a full URL starting with http:// or https://",
+    "urlHealthIdle": "Not yet checked",
+    "urlHealthChecking": "Checking…",
+    "urlHealthOk": "Connected to Gitea",
+    "urlHealthUnreachable": "Unreachable",
+    "setupHelpSummary": "Setting up OAuth",
+    "setupHelpStep1": "Go to your Gitea instance → Site Administration → Applications → OAuth2 Applications",
+    "setupHelpStep2": "Register a new application with redirect URI:",
+    "setupHelpRedirect": "/api/auth/callback",
+    "setupHelpStep3": "Set the environment variables GITEA_OAUTH_CLIENT_ID and GITEA_OAUTH_CLIENT_SECRET",
+    "setupHelpStep4": "Or use the CLI:",
+    "setupHelpCli": "fgit token setup-oauth",
+    "copyCode": "Copy",
+    "copyCodeCopied": "Copied",
+    "oauthError": {
+      "no-gitea-url": "Gitea URL is not configured. Set GITEA_URL environment variable.",
+      "oauth-not-configured": "OAuth is not configured. Set GITEA_OAUTH_CLIENT_ID and GITEA_OAUTH_CLIENT_SECRET.",
+      "oauth-session-expired": "Your OAuth session expired. Please try signing in again.",
+      "oauth-state-mismatch": "Security check failed. Please try signing in again.",
+      "oauth-exchange-failed": "Failed to exchange authorization code. Please try again.",
+      "oauth-token-invalid": "Received an invalid token from Gitea. Please try again.",
+      "oauth-access_denied": "You denied the authorization request.",
+      "oauth-missing-params": "Missing required OAuth parameters. Please try again.",
+      "oauth-invalid-state": "Invalid OAuth state. Please try signing in again.",
+      "unknown": "Authentication error: {error}"
+    }
   }
 }
