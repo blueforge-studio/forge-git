@@ -1,2 +1,1 @@
-// Public API is added in subsequent tasks.
-export {}
+export * from './schema'
