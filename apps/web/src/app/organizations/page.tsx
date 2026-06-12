@@ -3,8 +3,24 @@ import { listOrgs } from '@forge-git/gitea-bridge'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@forge-git/ui'
-import EmptyState from '@/components/empty-state'
+import OrgsFirstRun from '@/components/orgs-first-run'
+import { getTranslations } from 'next-intl/server'
 import { Building2, Plus } from 'lucide-react'
+
+async function OrgsFirstRunSection() {
+  const t = await getTranslations('organizations.firstRun')
+  return (
+    <OrgsFirstRun
+      labels={{
+        headline: t('headline'),
+        subhead: t('subhead'),
+        primaryCta: t('primaryCta'),
+        secondaryLearnTitle: t('secondaryLearnTitle'),
+        secondaryLearnDesc: t('secondaryLearnDesc'),
+      }}
+    />
+  )
+}
 
 export default async function OrganizationsPage() {
   const session = await getSession()
@@ -44,11 +60,7 @@ export default async function OrganizationsPage() {
       </div>
 
       {orgs.length === 0 ? (
-        <EmptyState
-          icon={Building2}
-          title="No organizations"
-          description="You are not a member of any organizations yet."
-        />
+        <OrgsFirstRunSection />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {orgs.map((org) => (
