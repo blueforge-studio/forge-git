@@ -180,8 +180,10 @@ the form's error state would be confusing.
 
 ## i18n
 
-Wrap new strings in `useTranslations('login')` and add entries to both
-`en.json` and `da.json`. New keys:
+The login page currently has no i18n — all copy is hardcoded. This
+change introduces the `login` namespace and wraps new strings in
+`useTranslations('login')`. Existing hardcoded strings also move to i18n
+as part of this change. New keys (in `en.json`):
 
 - `tagline`
 - `or_use_pat`
@@ -194,6 +196,11 @@ Wrap new strings in `useTranslations('login')` and add entries to both
 - `new_here_get_token`
 - `last_used_hint`
 - `url_invalid`
+
+Add the same keys to `es.json` and `zh.json`. The existing
+`onError: MISSING_MESSAGE → return error.key` handler means a missing
+translation falls back to the key text rather than crashing, so the
+non-English locales can ship with English placeholders if needed.
 
 ## Testing
 
@@ -253,7 +260,8 @@ review are enough for a single-page change.
 | `apps/web/e2e/auth.spec.ts` | Update existing assertions, add 4 new tests |
 | `apps/web/playwright.config.ts` | Add clipboard permissions (if not already set) |
 | `apps/web/messages/en.json` | Add new i18n keys |
-| `apps/web/messages/da.json` | Add new i18n keys (Danish translations) |
+| `apps/web/messages/es.json` | Add new i18n keys |
+| `apps/web/messages/zh.json` | Add new i18n keys |
 
 ## What's NOT in scope
 
