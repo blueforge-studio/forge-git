@@ -3,15 +3,7 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { forgeOrgs } from './schema'
 import { runMigrations } from './client'
 
-export type Org = {
-  id: string
-  giteaOrg: string
-  giteaId: number
-  displayName: string | null
-  description: string | null
-  createdAt: Date
-  updatedAt: Date
-}
+export type Org = typeof forgeOrgs.$inferSelect
 
 export async function listOrgs(db: NodePgDatabase): Promise<Org[]> {
   await runMigrations()

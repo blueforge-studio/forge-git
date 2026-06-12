@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { eq } from 'drizzle-orm'
+import { forgeOrgs } from '../src/schema'
 
 const mockDb = {
   select: vi.fn().mockReturnThis(),
@@ -43,7 +45,7 @@ describe('listOrgs', () => {
     const result = await listOrgs(mockDb as any)
 
     expect(mockDb.select).toHaveBeenCalled()
-    expect(mockDb.from).toHaveBeenCalled()
+    expect(mockDb.from).toHaveBeenCalledWith(forgeOrgs)
     expect(mockDb.orderBy).toHaveBeenCalled()
     expect(result).toBe(expected)
   })
@@ -59,9 +61,18 @@ describe('getOrgByName', () => {
 
     expect(mockDb.select).toHaveBeenCalled()
     expect(mockDb.from).toHaveBeenCalled()
-    expect(mockDb.where).toHaveBeenCalled()
+    expect(mockDb.where).toHaveBeenCalledWith(eq(forgeOrgs.giteaOrg, 'acme'))
     expect(mockDb.limit).toHaveBeenCalledWith(1)
     expect(result).toBe(expected)
+  })
+
+  it('returns null when no row matches', async () => {
+    vi.mocked(mockDb.limit).mockResolvedValue([])
+
+    const { getOrgByName } = await import('../src/orgs')
+    const result = await getOrgByName(mockDb as any, 'nonexistent')
+
+    expect(result).toBeNull()
   })
 })
 
@@ -73,9 +84,18 @@ describe('getOrgByGiteaId', () => {
     const { getOrgByGiteaId } = await import('../src/orgs')
     const result = await getOrgByGiteaId(mockDb as any, 100)
 
-    expect(mockDb.where).toHaveBeenCalled()
+    expect(mockDb.where).toHaveBeenCalledWith(eq(forgeOrgs.giteaId, 100))
     expect(mockDb.limit).toHaveBeenCalledWith(1)
     expect(result).toBe(expected)
+  })
+
+  it('returns null when no row matches', async () => {
+    vi.mocked(mockDb.limit).mockResolvedValue([])
+
+    const { getOrgByGiteaId } = await import('../src/orgs')
+    const result = await getOrgByGiteaId(mockDb as any, 999)
+
+    expect(result).toBeNull()
   })
 })
 
@@ -100,8 +120,13 @@ describe('upsertOrgByGiteaId', () => {
       description: null,
     })
     expect(mockDb.onConflictDoUpdate).toHaveBeenCalledWith({
-      target: expect.anything(),
-      set: expect.objectContaining({ giteaOrg: 'acme' }),
+      target: forgeOrgs.giteaId,
+      set: {
+        giteaOrg: 'acme',
+        displayName: 'Acme',
+        description: null,
+        updatedAt: expect.any(Date),
+      },
     })
     expect(result).toBe(returned)
   })
@@ -113,6 +138,6 @@ describe('deleteOrgByName', () => {
     await deleteOrgByName(mockDb as any, 'acme')
 
     expect(mockDb.delete).toHaveBeenCalled()
-    expect(mockDb.where).toHaveBeenCalled()
+    expect(mockDb.where).toHaveBeenCalledWith(eq(forgeOrgs.giteaOrg, 'acme'))
   })
 })
