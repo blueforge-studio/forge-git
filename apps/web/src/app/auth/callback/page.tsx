@@ -86,7 +86,7 @@ function CallbackContent() {
 
 export default function AuthCallbackPage() {
   return (
-    <AuthShell tagline="">
+    <AuthShell>
       <Suspense fallback={null}>
         <CallbackContent />
       </Suspense>

@@ -19,7 +19,7 @@ export function AuthShell({
   )
 }
 
-function BrandAside({ tagline }: { tagline: string }) {
+function BrandAside({ tagline }: { tagline?: string }) {
   return (
     <aside className="hidden md:flex md:w-2/5 relative overflow-hidden bg-gradient-to-br from-primary/20 via-purple-500/15 to-pink-500/20">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(120,80,200,0.15),transparent_60%)]" />
@@ -34,9 +34,13 @@ function BrandAside({ tagline }: { tagline: string }) {
           />
           <span className="font-semibold text-xl text-foreground">Forge git</span>
         </Link>
-        <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">
-          {tagline}
-        </h2>
+        {tagline ? (
+          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">
+            {tagline}
+          </h2>
+        ) : (
+          <span className="sr-only">Forge git</span>
+        )}
       </div>
     </aside>
   )
