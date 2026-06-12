@@ -10,14 +10,14 @@ test.describe('Unauthenticated pages', () => {
 
   test('login page renders the sign in form', async ({ page }) => {
     await page.goto('/login')
-    await expect(page.locator('text=Sign in to forge-git')).toBeVisible()
-    await expect(page.locator('text=Sign in with Gitea')).toBeVisible()
-    await expect(page.locator('text=Manual token')).toBeVisible()
+    await expect(page.locator('h1')).toHaveText('Welcome back')
+    await expect(page.locator('a', { hasText: 'Sign in with Gitea' })).toBeVisible()
+    await expect(page.locator('summary', { hasText: 'Use a personal access token' })).toBeVisible()
   })
 
   test('login page PAT form is behind details toggle', async ({ page }) => {
     await page.goto('/login')
-    const details = page.locator('details')
+    const details = page.locator('details').filter({ has: page.locator('input[name="giteaUrl"]') })
     await expect(details.locator('input[name="giteaUrl"]')).not.toBeVisible()
     await details.locator('summary').click()
     await expect(page.locator('input[name="giteaUrl"]')).toBeVisible()
@@ -26,7 +26,10 @@ test.describe('Unauthenticated pages', () => {
 
   test('login page shows OAuth setup instructions', async ({ page }) => {
     await page.goto('/login')
-    await expect(page.locator('text=Setting up OAuth')).toBeVisible()
+    const summary = page.locator('summary', { hasText: 'Setting up OAuth' })
+    await expect(summary).toBeVisible()
+    await summary.click()
+    await expect(page.locator('text=fgit token setup-oauth')).toBeVisible()
   })
 
   test('PAT form shows error with empty fields', async ({ page }) => {
