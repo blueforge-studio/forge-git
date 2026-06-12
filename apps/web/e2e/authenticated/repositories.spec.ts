@@ -97,4 +97,26 @@ test.describe('Authenticated Repositories empty state', () => {
     await expect(learnMore).toHaveAttribute('rel', /noopener/)
     await expect(learnMore).toHaveAttribute('href', /docs\.gitea\.com/)
   })
+
+  test('first-run headline renders in all 3 locales', async ({ page }) => {
+    // All 3 locales ship with the same English placeholder today (per
+    // established pattern). This smoke test guards against any future
+    // translation that breaks the new `repositories.firstRun` namespace.
+    // The i18n config uses `localePrefix: 'never'`, so locale is selected
+    // via the NEXT_LOCALE cookie rather than the URL prefix.
+    for (const locale of ['en', 'es', 'zh']) {
+      await page.context().addCookies([
+        {
+          name: 'NEXT_LOCALE',
+          value: locale,
+          domain: 'localhost',
+          path: '/',
+        },
+      ])
+      await page.goto('/repositories')
+      await expect(
+        page.getByRole('heading', { name: /welcome to forge-git/i })
+      ).toBeVisible()
+    }
+  })
 })
