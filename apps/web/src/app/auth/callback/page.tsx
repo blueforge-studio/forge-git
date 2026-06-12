@@ -29,12 +29,12 @@ function CallbackContent() {
     }
   }, [error, status, router])
 
-  let errorMessage: string
+  let errorMessage = error ? tLogin('oauthError.unknown', { error }) : ''
   if (error) {
     try {
       errorMessage = tLogin(`oauthError.${error}` as never)
     } catch {
-      errorMessage = tLogin('oauthError.unknown', { error })
+      // keep unknown fallback
     }
   }
 
