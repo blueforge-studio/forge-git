@@ -1,11 +1,42 @@
 'use client'
 
-import { useActionState, Suspense } from 'react'
+import { useActionState, Suspense, useEffect, useState, useCallback } from 'react'
 import { login } from './actions'
 import { Server, LogIn, ChevronRight, Key, AlertCircle } from 'lucide-react'
 import { Button } from '@forge-git/ui'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
+
+const GITEA_URL_STORAGE_KEY = 'forge-git:last-gitea-url'
+
+function useGiteaUrlMemory() {
+  const [url, setUrl] = useState('')
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(GITEA_URL_STORAGE_KEY)
+      if (stored) setUrl(stored)
+    } catch {
+      // private browsing / quota — degrade silently
+    }
+  }, [])
+
+  const persist = useCallback((value: string) => {
+    setUrl(value)
+    try {
+      if (value) {
+        window.localStorage.setItem(GITEA_URL_STORAGE_KEY, value)
+      } else {
+        window.localStorage.removeItem(GITEA_URL_STORAGE_KEY)
+      }
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  return { url, setUrl: persist }
+}
 
 function OAuthError() {
   const searchParams = useSearchParams()
@@ -37,6 +68,13 @@ function OAuthError() {
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, { error: '' })
+  const t = useTranslations('login')
+  const { url: rememberedUrl, setUrl: persistUrl } = useGiteaUrlMemory()
+  const [giteaUrl, setGiteaUrl] = useState('')
+
+  useEffect(() => {
+    if (rememberedUrl) setGiteaUrl(rememberedUrl)
+  }, [rememberedUrl])
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 bg-background">
@@ -104,10 +142,20 @@ export default function LoginPage() {
                   id="giteaUrl"
                   name="giteaUrl"
                   type="text"
-                  placeholder="https://forge-git.blueforge.studio"
+                  placeholder={t('giteaUrlPlaceholder')}
                   required
+                  value={giteaUrl}
+                  onChange={(e) => {
+                    setGiteaUrl(e.target.value)
+                    persistUrl(e.target.value)
+                  }}
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
                 />
+                {giteaUrl && giteaUrl === rememberedUrl && (
+                  <p data-testid="last-used-hint" className="text-[10px] text-muted-foreground">
+                    {t('lastUsedHint')}
+                  </p>
+                )}
                 <input
                   id="token"
                   name="token"
