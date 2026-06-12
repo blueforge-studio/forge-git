@@ -259,5 +259,36 @@
       "secondaryLearnTitle": "Learn more",
       "secondaryLearnDesc": "Browse the Gitea user guide"
     }
+  },
+  "dashboard": {
+    "firstRun": {
+      "headline": "Welcome to forge-git",
+      "subhead": "Create your first repository to get started",
+      "primaryCta": "Create your first repository",
+      "secondaryOrgTitle": "Create an organization",
+      "secondaryOrgDesc": "Host repos for a team or project",
+      "secondaryLearnTitle": "Learn more",
+      "secondaryLearnDesc": "Browse the Gitea user guide"
+    }
+  },
+  "builds": {
+    "firstRun": {
+      "headline": "No builds yet",
+      "subhead": "Trigger your first build from a repository to get started",
+      "primaryCta": "Go to your repositories",
+      "secondaryLearnTitle": "What is CI/CD?",
+      "secondaryLearnDesc": "Read the Gitea Actions guide",
+      "secondaryBrowseTitle": "Browse repositories",
+      "secondaryBrowseDesc": "See all repositories on this instance"
+    }
+  },
+  "organizations": {
+    "firstRun": {
+      "headline": "No organizations yet",
+      "subhead": "Create an organization to start collaborating with your team",
+      "primaryCta": "Create your first organization",
+      "secondaryLearnTitle": "Learn about organizations",
+      "secondaryLearnDesc": "Read the Gitea organizations guide"
+    }
   }
 }

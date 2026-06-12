@@ -260,5 +260,36 @@
       "secondaryLearnTitle": "Learn more",
       "secondaryLearnDesc": "Browse the Gitea user guide"
     }
+  },
+  "dashboard": {
+    "firstRun": {
+      "headline": "欢迎使用 forge-git",
+      "subhead": "创建你的第一个仓库以开始使用",
+      "primaryCta": "创建你的第一个仓库",
+      "secondaryOrgTitle": "创建一个组织",
+      "secondaryOrgDesc": "为团队或项目托管仓库",
+      "secondaryLearnTitle": "了解更多",
+      "secondaryLearnDesc": "查看 Gitea 用户指南"
+    }
+  },
+  "builds": {
+    "firstRun": {
+      "headline": "还没有构建",
+      "subhead": "从一个仓库触发你的第一次构建以开始使用",
+      "primaryCta": "前往你的仓库",
+      "secondaryLearnTitle": "什么是 CI/CD?",
+      "secondaryLearnDesc": "阅读 Gitea Actions 指南",
+      "secondaryBrowseTitle": "浏览仓库",
+      "secondaryBrowseDesc": "查看此实例上的所有仓库"
+    }
+  },
+  "organizations": {
+    "firstRun": {
+      "headline": "还没有组织",
+      "subhead": "创建一个组织以开始与你的团队协作",
+      "primaryCta": "创建你的第一个组织",
+      "secondaryLearnTitle": "了解组织",
+      "secondaryLearnDesc": "阅读 Gitea 组织指南"
+    }
   }
 }
