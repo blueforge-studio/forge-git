@@ -1,0 +1,41 @@
+{
+  "name": "@forge-git/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./schema": "./src/schema.ts",
+    "./orgs": "./src/orgs.ts",
+    "./members": "./src/members.ts",
+    "./users": "./src/users.ts",
+    "./auth-adapter": "./src/auth-adapter.ts"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "^0.31.10",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@blueforge-studio/auth-session": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@blueforge-studio/auth-session": { "optional": true }
+  }
+}
