@@ -123,8 +123,9 @@ ever needs them, promote to `lib/login/`.
   on success. Uses `navigator.clipboard.writeText`.
 - Add a "New here? Get a token →" link in the PAT section that points to
   `${giteaUrl}/user/settings/applications` once a URL is entered
-  (falls back to a static Gitea docs URL if empty). Opens in a new tab
-  with `rel="noopener"`.
+  (falls back to `https://docs.gitea.com/administration/config-cheat-sheet/`
+  as the help URL when no URL is entered yet). Opens in a new tab with
+  `rel="noopener"`.
 
 ## Data flow
 
@@ -216,8 +217,10 @@ updates:
    `localStorage.setItem('forge-git:last-gitea-url', 'https://demo.example.com')`
    in `addInitScript`, navigate to `/login`, open PAT details, assert
    the URL input is pre-filled.
-2. `login page URL health check shows status` — type a URL, wait 500ms,
-   assert the health pill text changes (use a known-good test target).
+2. `login page URL health check shows status` — stub
+   `GET /api/v1/version` to return 200 for `https://test-gitea.example.com`
+   (and 5xx for `https://broken.example.com`) via `page.route`, type each
+   URL, wait 500ms, assert the pill shows the matching status.
 3. `login page setup help is collapsed by default` — assert the setup
    `<details>` is not open on first load.
 4. `login page setup help copy button works` — open setup help, click
