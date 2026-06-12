@@ -301,6 +301,9 @@ const server = http.createServer((req, res) => {
   }
 
   if (path === '/api/v1/repos/issues/search') {
+    if (auth === `Bearer ${EMPTY_ALL_TOKEN}`) {
+      return json(res, 200, { ok: true, data: [] })
+    }
     const { query } = parseUrl(req.url ?? '/')
     const type = query.get('type')
     if (type === 'pulls') {
