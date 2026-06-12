@@ -20,6 +20,9 @@ function parseUrl(url: string) {
   return { path: u.pathname, query: u.searchParams }
 }
 
+// Special tokens that change mock server behavior for specific test scenarios
+const EMPTY_REPOS_TOKEN = 'mock-token-empty-repos'
+
 const server = http.createServer((req, res) => {
   const { path } = parseUrl(req.url ?? '/')
 
@@ -64,6 +67,9 @@ const server = http.createServer((req, res) => {
 
   // ─── Repositories ────────────────────────────────────────────────
   if (path === '/api/v1/user/repos' || path === '/api/v1/users/testuser/repos') {
+    if (auth === `Bearer ${EMPTY_REPOS_TOKEN}`) {
+      return json(res, 200, [])
+    }
     return json(res, 200, [
       {
         id: 1, name: 'frontend', full_name: 'testuser/frontend', private: false,
