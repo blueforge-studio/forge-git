@@ -196,6 +196,8 @@
     "setupHelpCli": "fgit token setup-oauth",
     "copyCode": "Copy",
     "copyCodeCopied": "Copied",
+    "newHereCreateAccount": "New here? Create a Gitea account →",
+    "forgotGiteaUrl": "Forgot your Gitea URL?",
     "oauthError": {
       "no-gitea-url": "Gitea URL is not configured. Set GITEA_URL environment variable.",
       "oauth-not-configured": "OAuth is not configured. Set GITEA_OAUTH_CLIENT_ID and GITEA_OAUTH_CLIENT_SECRET.",
@@ -207,6 +209,45 @@
       "oauth-missing-params": "Missing required OAuth parameters. Please try again.",
       "oauth-invalid-state": "Invalid OAuth state. Please try signing in again.",
       "unknown": "Authentication error: {error}"
+    }
+  },
+  "auth": {
+    "signup": {
+      "brandTagline": "Get a Gitea account",
+      "headline": "Don't have an account yet?",
+      "subhead": "forge-git uses your Gitea instance for everything — repos, auth, identity. You'll need a Gitea account to sign in.",
+      "step1Title": "1. Get a Gitea account",
+      "step1PublicTitle": "Sign up at a public instance",
+      "step1PublicDesc": "Use a hosted Gitea service. Free, no setup.",
+      "step1SelfHostTitle": "Self-host Gitea",
+      "step1SelfHostDesc": "Run your own instance. Full control.",
+      "step1TeamTitle": "Ask your team admin",
+      "step1TeamDesc": "Most teams have a shared Gitea instance.",
+      "step2Title": "2. Create a personal access token",
+      "step2Cta": "Open Gitea token settings",
+      "backToSignIn": "Already have an account? Sign in →"
+    },
+    "forgotToken": {
+      "brandTagline": "Find your Gitea URL",
+      "headline": "Forgot your Gitea URL?",
+      "subhead": "The address of the Gitea instance you sign in to. Often looks like https://git.yourcompany.com",
+      "checkBrowserTitle": "Check your browser",
+      "checkBrowserSaved": "We saved this from a previous sign-in on this device.",
+      "checkBrowserEmpty": "Nothing saved on this device. Try the suggestions below or ask your team.",
+      "whereToFindTitle": "Where to find it",
+      "whereToFindEmail": "Check the email invite from your team admin",
+      "whereToFindTeammate": "Ask a teammate for the URL they use",
+      "whereToFindHistory": "Search your browser history for \"gitea\" or \"forge\"",
+      "whereToFindWiki": "Check your team's wiki or runbook",
+      "foundItSignIn": "Found it? Sign in →"
+    },
+    "callback": {
+      "brandTagline": "Welcome back",
+      "signingInHeadline": "Signing you in…",
+      "signingInSubhead": "Finishing your Gitea session",
+      "errorHeadline": "We couldn't sign you in",
+      "errorSubhead": "Something went wrong completing your Gitea session.",
+      "tryAgain": "Try again"
     }
   }
 }
