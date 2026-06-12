@@ -3,7 +3,7 @@
 import { useActionState, Suspense, useEffect, useState, useCallback } from 'react'
 import { login } from './actions'
 import { Server, LogIn, ChevronRight, Key, AlertCircle } from 'lucide-react'
-import { Button } from '@forge-git/ui'
+import { Button, cn } from '@forge-git/ui'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
@@ -36,6 +36,42 @@ function useGiteaUrlMemory() {
   }, [])
 
   return { url, setUrl: persist }
+}
+
+type HealthStatus = 'idle' | 'checking' | 'ok' | 'unreachable'
+
+function useUrlHealth(url: string) {
+  const [status, setStatus] = useState<HealthStatus>('idle')
+
+  useEffect(() => {
+    if (!url) {
+      setStatus('idle')
+      return
+    }
+
+    let cancelled = false
+    const controller = new AbortController()
+
+    setStatus('checking')
+    const timer = setTimeout(async () => {
+      try {
+        await fetch(`${url}/api/v1/version`, { method: 'GET', signal: controller.signal })
+        if (!cancelled) setStatus('ok')
+      } catch (err) {
+        if (cancelled) return
+        if (err instanceof DOMException && err.name === 'AbortError') return
+        setStatus('unreachable')
+      }
+    }, 400)
+
+    return () => {
+      cancelled = true
+      controller.abort()
+      clearTimeout(timer)
+    }
+  }, [url])
+
+  return status
 }
 
 function OAuthError() {
@@ -71,6 +107,7 @@ export default function LoginPage() {
   const t = useTranslations('login')
   const { url: rememberedUrl, setUrl: persistUrl } = useGiteaUrlMemory()
   const [giteaUrl, setGiteaUrl] = useState('')
+  const healthStatus = useUrlHealth(giteaUrl)
 
   useEffect(() => {
     if (rememberedUrl) setGiteaUrl(rememberedUrl)
@@ -138,19 +175,44 @@ export default function LoginPage() {
               </summary>
 
               <form action={formAction} className="mt-4 space-y-3">
-                <input
-                  id="giteaUrl"
-                  name="giteaUrl"
-                  type="text"
-                  placeholder={t('giteaUrlPlaceholder')}
-                  required
-                  value={giteaUrl}
-                  onChange={(e) => {
-                    setGiteaUrl(e.target.value)
-                    persistUrl(e.target.value)
-                  }}
-                  className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
-                />
+                <div className="flex items-center gap-2">
+                  <input
+                    id="giteaUrl"
+                    name="giteaUrl"
+                    type="text"
+                    placeholder={t('giteaUrlPlaceholder')}
+                    required
+                    value={giteaUrl}
+                    onChange={(e) => {
+                      setGiteaUrl(e.target.value)
+                      persistUrl(e.target.value)
+                    }}
+                    className="flex-1 px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
+                  />
+                  {healthStatus !== 'idle' && (
+                    <span
+                      data-testid="url-health-pill"
+                      className={cn(
+                        'inline-flex items-center gap-1.5 text-xs whitespace-nowrap',
+                        healthStatus === 'checking' && 'text-muted-foreground',
+                        healthStatus === 'ok' && 'text-emerald-600 dark:text-emerald-400',
+                        healthStatus === 'unreachable' && 'text-destructive',
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'w-1.5 h-1.5 rounded-full',
+                          healthStatus === 'checking' && 'bg-muted-foreground animate-pulse',
+                          healthStatus === 'ok' && 'bg-emerald-600 dark:bg-emerald-400',
+                          healthStatus === 'unreachable' && 'bg-destructive',
+                        )}
+                      />
+                      {healthStatus === 'checking' && t('urlHealthChecking')}
+                      {healthStatus === 'ok' && t('urlHealthOk')}
+                      {healthStatus === 'unreachable' && t('urlHealthUnreachable')}
+                    </span>
+                  )}
+                </div>
                 {giteaUrl && giteaUrl === rememberedUrl && (
                   <p data-testid="last-used-hint" className="text-[10px] text-muted-foreground">
                     {t('lastUsedHint')}
