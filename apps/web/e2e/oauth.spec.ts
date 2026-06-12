@@ -56,17 +56,17 @@ test.describe('OAuth authorize route', () => {
 })
 
 test.describe('OAuth callback route', () => {
-  test('callback redirects to login when missing code and state', async ({ page }) => {
+  test('callback redirects to /auth/callback when missing code and state', async ({ page }) => {
     await page.goto('/api/auth/callback')
-    await page.waitForURL('**/login**')
-    expect(page.url()).toContain('/login')
+    await page.waitForURL(/\/auth\/callback\?error=oauth-/)
+    expect(page.url()).toContain('/auth/callback')
     expect(page.url()).toContain('error=oauth-missing-params')
   })
 
-  test('callback redirects to login when state cookie is missing', async ({ page }) => {
+  test('callback redirects to /auth/callback when state cookie is missing', async ({ page }) => {
     await page.goto('/api/auth/callback?code=test-code&state=test-state')
-    await page.waitForURL('**/login**')
-    expect(page.url()).toContain('/login')
+    await page.waitForURL(/\/auth\/callback\?error=oauth-/)
+    expect(page.url()).toContain('/auth/callback')
     expect(page.url()).toContain('error=oauth-session-expired')
   })
 })

@@ -12,37 +12,37 @@ export async function GET(request: NextRequest) {
 
   if (errorParam) {
     console.error('[oauth] Gitea returned error:', errorParam)
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('error', `oauth-${errorParam}`)
-    return NextResponse.redirect(loginUrl)
+    const callbackUrl = new URL('/auth/callback', request.url)
+    callbackUrl.searchParams.set('error', `oauth-${errorParam}`)
+    return NextResponse.redirect(callbackUrl)
   }
 
   if (!code || !state) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('error', 'oauth-missing-params')
-    return NextResponse.redirect(loginUrl)
+    const callbackUrl = new URL('/auth/callback', request.url)
+    callbackUrl.searchParams.set('error', 'oauth-missing-params')
+    return NextResponse.redirect(callbackUrl)
   }
 
   const stateCookie = request.cookies.get('forge-git-oauth-state')
   if (!stateCookie?.value) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('error', 'oauth-session-expired')
-    return NextResponse.redirect(loginUrl)
+    const callbackUrl = new URL('/auth/callback', request.url)
+    callbackUrl.searchParams.set('error', 'oauth-session-expired')
+    return NextResponse.redirect(callbackUrl)
   }
 
   let stateData: { verifier: string; state: string; baseUrl: string }
   try {
     stateData = JSON.parse(stateCookie.value)
   } catch {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('error', 'oauth-invalid-state')
-    return NextResponse.redirect(loginUrl)
+    const callbackUrl = new URL('/auth/callback', request.url)
+    callbackUrl.searchParams.set('error', 'oauth-invalid-state')
+    return NextResponse.redirect(callbackUrl)
   }
 
   if (stateData.state !== state) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('error', 'oauth-state-mismatch')
-    return NextResponse.redirect(loginUrl)
+    const callbackUrl = new URL('/auth/callback', request.url)
+    callbackUrl.searchParams.set('error', 'oauth-state-mismatch')
+    return NextResponse.redirect(callbackUrl)
   }
 
   const { verifier, baseUrl } = stateData
@@ -60,18 +60,18 @@ export async function GET(request: NextRequest) {
     )
   } catch (err) {
     console.error('[oauth] Token exchange failed:', err)
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('error', 'oauth-exchange-failed')
-    return NextResponse.redirect(loginUrl)
+    const callbackUrl = new URL('/auth/callback', request.url)
+    callbackUrl.searchParams.set('error', 'oauth-exchange-failed')
+    return NextResponse.redirect(callbackUrl)
   }
 
   try {
     await getCurrentUser({ token: tokens.access_token, baseUrl })
   } catch (err) {
     console.error('[oauth] Token validation failed:', err)
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('error', 'oauth-token-invalid')
-    return NextResponse.redirect(loginUrl)
+    const callbackUrl = new URL('/auth/callback', request.url)
+    callbackUrl.searchParams.set('error', 'oauth-token-invalid')
+    return NextResponse.redirect(callbackUrl)
   }
 
   await createOAuthSession(
@@ -81,7 +81,9 @@ export async function GET(request: NextRequest) {
     tokens.expires_in,
   )
 
-  const response = NextResponse.redirect(new URL('/', request.url))
+  const response = NextResponse.redirect(
+    new URL('/auth/callback?status=success', request.url),
+  )
   response.cookies.set('forge-git-oauth-state', '', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
