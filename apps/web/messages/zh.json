@@ -249,5 +249,16 @@
       "errorSubhead": "Something went wrong completing your Gitea session.",
       "tryAgain": "Try again"
     }
+  },
+  "repositories": {
+    "firstRun": {
+      "headline": "Welcome to forge-git",
+      "subhead": "Create your first repository to get started",
+      "primaryCta": "Create your first repository",
+      "secondaryOrgTitle": "Create an organization",
+      "secondaryOrgDesc": "Host repos for a team or project",
+      "secondaryLearnTitle": "Learn more",
+      "secondaryLearnDesc": "Browse the Gitea user guide"
+    }
   }
 }
