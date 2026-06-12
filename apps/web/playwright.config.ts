@@ -32,7 +32,10 @@ export default defineConfig({
       name: 'chromium',
       testMatch: /^(?!.*authenticated\/).*\.spec\.ts$/,
       testIgnore: /auth\.setup\.ts/,
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        permissions: ['clipboard-read', 'clipboard-write'],
+      },
     },
   ],
 
