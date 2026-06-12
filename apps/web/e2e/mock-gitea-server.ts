@@ -22,6 +22,7 @@ function parseUrl(url: string) {
 
 // Special tokens that change mock server behavior for specific test scenarios
 const EMPTY_REPOS_TOKEN = 'mock-token-empty-repos'
+const EMPTY_ALL_TOKEN = 'mock-token-empty-all'
 
 const server = http.createServer((req, res) => {
   const { path } = parseUrl(req.url ?? '/')
@@ -67,7 +68,7 @@ const server = http.createServer((req, res) => {
 
   // ─── Repositories ────────────────────────────────────────────────
   if (path === '/api/v1/user/repos' || path === '/api/v1/users/me/repos' || path === '/api/v1/users/testuser/repos') {
-    if (auth === `Bearer ${EMPTY_REPOS_TOKEN}`) {
+    if (auth === `Bearer ${EMPTY_REPOS_TOKEN}` || auth === `Bearer ${EMPTY_ALL_TOKEN}`) {
       return json(res, 200, [])
     }
     return json(res, 200, [
@@ -211,6 +212,9 @@ const server = http.createServer((req, res) => {
 
   // ─── Organizations ───────────────────────────────────────────────
   if (path === '/api/v1/user/orgs' || path === '/api/v1/users/testuser/orgs') {
+    if (auth === `Bearer ${EMPTY_ALL_TOKEN}`) {
+      return json(res, 200, [])
+    }
     return json(res, 200, [{
       id: 2, name: 'testorg', full_name: 'Test Organization',
       description: 'A test organization', visibility: 'public',
