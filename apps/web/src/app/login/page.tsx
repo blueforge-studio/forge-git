@@ -127,6 +127,11 @@ export default function LoginPage() {
         <p className="text-xs text-muted-foreground text-center">
           {t('oauthHint')}
         </p>
+        <p className="text-xs text-muted-foreground text-center">
+          <Link href="/signup" className="text-primary hover:underline">
+            {t('newHereCreateAccount')}
+          </Link>
+        </p>
       </div>
 
       <div className="relative mb-5">
@@ -228,6 +233,11 @@ export default function LoginPage() {
             >
               {t('newHereGetToken')}
             </a>
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            <Link href="/forgot-token" className="text-primary hover:underline">
+              {t('forgotGiteaUrl')}
+            </Link>
           </p>
 
           {state.error && (

@@ -13,6 +13,11 @@ test.describe('Unauthenticated pages', () => {
     await expect(page.locator('h1')).toHaveText('Welcome back')
     await expect(page.locator('a', { hasText: 'Sign in with Gitea' })).toBeVisible()
     await expect(page.locator('summary', { hasText: 'Use a personal access token' })).toBeVisible()
+    await expect(page.getByRole('link', { name: /new here\?.*create a gitea account/i })).toBeVisible()
+
+    // Open PAT details to verify the "Forgot your Gitea URL?" link
+    await page.locator('summary', { hasText: 'Use a personal access token' }).click()
+    await expect(page.getByRole('link', { name: /forgot your gitea url\?/i })).toBeVisible()
   })
 
   test('login page PAT form is behind details toggle', async ({ page }) => {
