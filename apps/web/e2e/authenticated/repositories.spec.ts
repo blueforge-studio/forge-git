@@ -3,46 +3,61 @@ import { test, expect } from '@playwright/test'
 test.describe('Authenticated Repositories', () => {
   test('lists repositories', async ({ page }) => {
     await page.goto('/repositories')
-    await expect(page.locator('text=Repositories')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'Repositories', level: 1 })
+    ).toBeVisible()
   })
 
   test('has new repository button', async ({ page }) => {
     await page.goto('/repositories')
-    await expect(page.locator('text=New Repository')).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'New Repository' })
+    ).toBeVisible()
   })
 
   test('shows repo details page with nav tabs', async ({ page }) => {
     await page.goto('/repositories/testuser/frontend')
-    await expect(page.locator('text=testuser/frontend')).toBeVisible()
-    await expect(page.locator('text=Overview')).toBeVisible()
-    await expect(page.locator('text=Files')).toBeVisible()
-    await expect(page.locator('text=Pull Requests')).toBeVisible()
-    await expect(page.locator('text=Issues')).toBeVisible()
-    await expect(page.locator('text=Releases')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'testuser/frontend' })
+    ).toBeVisible()
+    // Nav tabs are <Link> elements in RepoSettingsNav
+    await expect(page.getByRole('link', { name: 'Overview', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Files', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Pull Requests', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Issues', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Releases', exact: true })).toBeVisible()
   })
 })
 
 test.describe('Authenticated Pull Requests', () => {
   test('lists pull requests', async ({ page }) => {
     await page.goto('/repositories/testuser/frontend/pulls')
-    await expect(page.locator('text=Pull Requests')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'Pull Requests', level: 2 })
+    ).toBeVisible()
   })
 
   test('has new pull request button', async ({ page }) => {
     await page.goto('/repositories/testuser/frontend/pulls')
-    await expect(page.locator('text=New Pull Request')).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'New Pull Request' })
+    ).toBeVisible()
   })
 })
 
 test.describe('Authenticated Issues', () => {
   test('lists issues', async ({ page }) => {
     await page.goto('/repositories/testuser/frontend/issues')
-    await expect(page.locator('text=Issues')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'Issues', level: 2 })
+    ).toBeVisible()
   })
 
   test('has new issue button', async ({ page }) => {
     await page.goto('/repositories/testuser/frontend/issues')
-    await expect(page.locator('text=New Issue')).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'New Issue' })
+    ).toBeVisible()
   })
 })
 
