@@ -34,7 +34,7 @@ test.describe('Unauthenticated pages', () => {
 
   test('PAT form shows error with empty fields', async ({ page }) => {
     await page.goto('/login')
-    await page.locator('details summary').click()
+    await page.locator('details summary').first().click()
     await page.locator('details button[type="submit"]').click()
     await expect(page.locator('text=Gitea URL is required')).toBeVisible()
   })
