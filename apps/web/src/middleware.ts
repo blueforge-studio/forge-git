@@ -7,7 +7,7 @@ const intlMiddleware = createMiddleware(routing)
 
 const authMiddleware = createAuthMiddleware({
   cookieName: 'forge-git-session',
-  publicPaths: ['/', '/login', '/signup', '/forgot-token'],
+  publicPaths: ['/', '/login', '/signup', '/forgot-token', '/auth/callback'],
   authPrefix: '/login',
   signInPath: '/login',
   homePath: '/',

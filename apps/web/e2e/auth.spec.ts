@@ -136,6 +136,26 @@ test.describe('Unauthenticated pages', () => {
     const clipboardText = await page.evaluate(() => navigator.clipboard.readText())
     expect(clipboardText).toBe('https://git.example.com')
   })
+
+  test('callback page shows signing in state', async ({ page }) => {
+    await page.goto('/auth/callback')
+    await expect(page.getByRole('heading', { name: /signing you in/i })).toBeVisible()
+    await expect(page.getByText(/finishing your gitea session/i)).toBeVisible()
+  })
+
+  test('callback page shows error card on oauth error', async ({ page }) => {
+    await page.goto('/auth/callback?error=oauth-token-invalid')
+    await expect(page.getByRole('heading', { name: /couldn't sign you in/i })).toBeVisible()
+    await expect(page.getByTestId('callback-error').getByRole('alert')).toContainText(/invalid token/i)
+    await expect(page.getByTestId('callback-try-again')).toBeVisible()
+  })
+
+  test('callback page redirects to login on unknown state', async ({ page }) => {
+    // No ?status=success and no ?error= — should redirect to /login after 3s safety net
+    await page.goto('/auth/callback')
+    // The 600ms success redirect won't fire (no ?status=success), but the 3s safety net will
+    await page.waitForURL(/\/login/, { timeout: 5000 })
+  })
 })
 
 test.describe('Navigation', () => {
