@@ -92,6 +92,16 @@ test.describe('Unauthenticated pages', () => {
     await page.waitForURL('**/login**')
     expect(page.url()).toContain('/login')
   })
+
+  test('signup page renders helper content', async ({ page }) => {
+    await page.goto('/signup')
+    await expect(page.getByRole('heading', { name: /don't have an account yet/i })).toBeVisible()
+    await expect(page.getByText(/sign up at a public instance/i)).toBeVisible()
+    await expect(page.getByText(/self-host gitea/i)).toBeVisible()
+    await expect(page.getByText(/ask your team admin/i)).toBeVisible()
+    await expect(page.getByText(/create a personal access token/i)).toBeVisible()
+    await expect(page.getByRole('link', { name: /sign in/i }).last()).toBeVisible()
+  })
 })
 
 test.describe('Navigation', () => {
