@@ -5,7 +5,7 @@ import PricingSection from '@/components/landing/pricing-section'
 afterEach(() => cleanup())
 
 async function renderAsync(element: React.ReactElement) {
-  const Component = element.type as (...args: any[]) => Promise<JSX.Element>
+  const Component = element.type as (...args: any[]) => Promise<React.ReactElement>
   const jsx = await Component(element.props)
   return render(jsx)
 }

@@ -75,8 +75,8 @@ describe('Header', () => {
   })
 
   it('shows nav links when authenticated', async () => {
-    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
-    vi.mocked(getCurrentUser).mockResolvedValue({ login: 'octocat', avatar_url: '' })
+    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', baseUrl: 'https://gitea.example.com' })
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 1, login: 'octocat', avatar_url: '', is_admin: false, created_at: '2024-01-01T00:00:00Z' })
 
     render(await Header())
 
@@ -87,8 +87,8 @@ describe('Header', () => {
   })
 
   it('shows username when user data loads', async () => {
-    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
-    vi.mocked(getCurrentUser).mockResolvedValue({ login: 'octocat', avatar_url: '' })
+    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', baseUrl: 'https://gitea.example.com' })
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 1, login: 'octocat', avatar_url: '', is_admin: false, created_at: '2024-01-01T00:00:00Z' })
 
     render(await Header())
 
@@ -96,8 +96,8 @@ describe('Header', () => {
   })
 
   it('shows avatar image when user has avatar_url', async () => {
-    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
-    vi.mocked(getCurrentUser).mockResolvedValue({ login: 'octocat', avatar_url: 'https://example.com/avatar.png' })
+    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', baseUrl: 'https://gitea.example.com' })
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 1, login: 'octocat', avatar_url: 'https://example.com/avatar.png', is_admin: false, created_at: '2024-01-01T00:00:00Z' })
 
     render(await Header())
 
@@ -107,8 +107,8 @@ describe('Header', () => {
   })
 
   it('shows sign out and theme toggle when authenticated', async () => {
-    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
-    vi.mocked(getCurrentUser).mockResolvedValue({ login: 'octocat', avatar_url: '' })
+    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', baseUrl: 'https://gitea.example.com' })
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 1, login: 'octocat', avatar_url: '', is_admin: false, created_at: '2024-01-01T00:00:00Z' })
 
     render(await Header())
 
@@ -117,7 +117,7 @@ describe('Header', () => {
   })
 
   it('hides user info when getCurrentUser fails', async () => {
-    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
+    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', baseUrl: 'https://gitea.example.com' })
     vi.mocked(getCurrentUser).mockRejectedValue(new Error('Token expired'))
 
     render(await Header())
@@ -128,8 +128,8 @@ describe('Header', () => {
   })
 
   it('has correct repository link href', async () => {
-    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', giteaUrl: 'https://gitea.example.com' })
-    vi.mocked(getCurrentUser).mockResolvedValue({ login: 'octocat', avatar_url: '' })
+    vi.mocked(getActiveSession).mockResolvedValue({ token: 'tk', baseUrl: 'https://gitea.example.com' })
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 1, login: 'octocat', avatar_url: '', is_admin: false, created_at: '2024-01-01T00:00:00Z' })
 
     render(await Header())
 

@@ -43,8 +43,8 @@ const reviews: PullReviewWithComments[] = [
     submitted_at: '2024-01-15T11:00:00Z',
     reviewer: { ...baseReview.reviewer, id: 11, login: 'reviewer2' },
     inlineComments: [
-      { id: 100, body: 'This needs error handling', path: 'src/auth.ts', line: 42, diff_hunk: '', author: { login: 'reviewer2' }, created_at: '', updated_at: '' },
-      { id: 101, body: 'Use a constant here', path: 'src/auth.ts', line: 58, diff_hunk: '', author: { login: 'reviewer2' }, created_at: '', updated_at: '' },
+      { id: 100, body: 'This needs error handling', path: 'src/auth.ts', line: 42, diff_hunk: '', author: { id: 11, login: 'reviewer2', avatar_url: '' }, created_at: '', updated_at: '' },
+      { id: 101, body: 'Use a constant here', path: 'src/auth.ts', line: 58, diff_hunk: '', author: { id: 11, login: 'reviewer2', avatar_url: '' }, created_at: '', updated_at: '' },
     ],
   },
   {
@@ -136,7 +136,7 @@ describe('PullReviewList', () => {
     const singleCommentReview: PullReviewWithComments[] = [{
       ...baseReview,
       inlineComments: [
-        { id: 200, body: 'One comment', author: { login: 'r' }, created_at: '', updated_at: '' },
+        { id: 200, body: 'One comment', author: { id: 99, login: 'r', avatar_url: '' }, created_at: '', updated_at: '' },
       ],
     }]
 
