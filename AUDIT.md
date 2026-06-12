@@ -133,3 +133,89 @@ session (HMAC-signed OAuth + PAT), queue (BullMQ), minio (S3 presigned URLs), oa
 10. **Admin panel** for site configuration, user management, runner status.
 11. **Preview environments** using the existing `ForgeGitPreview` types + Docker Compose templates.
 12. **API documentation** for the gitea-bridge package.
+
+---
+
+## Screen Audit Setup
+
+Screen audits capture per-page screenshots, DOM snapshots, and a11y/perf
+metrics against a running dev server. They're a sibling to the Playwright
+E2E suite — same browser engine, different scope (visual regression vs.
+functional assertions).
+
+### Files
+
+```
+screen-audit/
+├── flow-kit.ts                 # Vendored from @blueforge-studio/audit-init
+├── run.mjs                     # Thin dispatch to screen-audit-runner
+└── flows/
+    ├── site-landing.flow.ts    # Public marketing landing (customized)
+    ├── auth-login.flow.ts      # /login — OAuth + PAT (customized)
+    ├── auth-signup.flow.ts     # /signup + /forgot-token helpers
+    ├── app-public.flow.ts      # /login + /signup smoke
+    ├── dashboard.flow.ts       # / — home/dashboard (no /dashboard route exists)
+    └── web.flow.ts             # Pre-existing minimal AuditFlow (legacy shape)
+```
+
+### Install
+
+```bash
+pnpm add -Dw @blueforge-studio/screen-audit \
+                 @blueforge-studio/screen-audit-runner \
+                 @blueforge-studio/audit-init
+```
+
+### Run
+
+```bash
+# Full set, desktop, light theme
+node screen-audit/run.mjs
+
+# Just the public smoke
+node screen-audit/run.mjs --flows site-landing,app-public
+
+# Quick iteration
+node screen-audit/run.mjs --flows site-landing --quick --full-page
+```
+
+Base URL: `http://localhost:3000` (set via `--base-url` at scaffold time, or
+overridden at run time with `--url` or the `APP_URL` env var).
+
+### Customizing flows
+
+The scaffolder emits generic testid placeholders (`login-title`,
+`email-input`, `register-link`, etc.). Each flow in `flows/` has been
+customized to use the real `data-testid` values from the app:
+
+| Flow | Real testids used |
+|------|-------------------|
+| `site-landing` | `site-header`, `hero-section`, `hero-heading`, `hero-sign-in-cta`, `feature-grid`, `how-it-works-section`, `pricing-section`, `cta-section`, `newsletter-section`, `site-footer` |
+| `auth-login` | `open-token-settings`, `new-here-get-token`, `url-health-pill`, `last-used-hint`, plus attribute selectors `[name="giteaUrl"]` / `[name="token"]` |
+| `auth-signup` | `open-token-settings` |
+| `app-public` | `open-token-settings` |
+| `dashboard` | `appFlow` one-liner — defaults to h1 + main |
+
+When adding new flows or new testids to existing flows:
+
+1. Add `data-testid="<name>"` to the React component.
+2. Use the shorthand in flow files: `el("my-id", { name: "..." })` →
+   expands to `[data-testid='my-id']`. For attribute or class selectors,
+   prefix with `[` / `.` / `#` to opt out of shorthand: `el('[name="x"]')`.
+3. Mark below-fold elements with `elBelow()` to trigger scroll, and
+   off-screen links/buttons with `elRef()` to skip element capture.
+
+### Known gaps (next iteration)
+
+- The 5 starter flows only cover public/auth surfaces. Authenticated flows
+  (dashboard stats, repo tree, file blob, build detail with SSE logs) need
+  a `Persona` and a session-cookie bootstrap. See
+  `@blueforge-studio/audit-init/flow-kit` `definePersona()`.
+- `auth-login` exercises the PAT form in error state. Add a positive-path
+  flow that fills a real token from `BLUEFORGE_E2E_TOKEN` and verifies
+  the dashboard renders.
+- `dashboard.flow.ts` is a one-liner with no testids — flesh out the
+  selector list once the dashboard widgets get testids.
+- The old `web.flow.ts` (legacy `AuditFlow` type, no flow-kit) should be
+  ported to the new factory or deleted once the new flows cover its
+  scope.

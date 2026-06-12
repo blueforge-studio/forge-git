@@ -5,3 +5,5 @@ dist/
 *.tsbuildinfo
 .env
 .playwright-mcp/
+test-results/
+screen-audit/results/
