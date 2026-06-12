@@ -149,15 +149,16 @@ before round-tripping.
 ### E2. Form action errors (existing, polished)
 
 The `state.error` from `useActionState` is rendered in the existing
-destructive banner. Three cases route through this banner:
+destructive banner. Two cases route through this banner, both already
+handled in `actions.ts`:
 
-- `Invalid token` (401 from Gitea) — already handled in `actions.ts`
-- `Cannot reach Gitea: <reason>` — already handled
-- Network failures (e.g. `TypeError: fetch failed`) — surface as
-  `Cannot reach Gitea. Check the URL and your connection.`
+- `Invalid token` (401 from Gitea)
+- `Cannot reach Gitea: <reason>`
 
 Banner gets a subtle entrance animation
-(`animate-in fade-in slide-in-from-top-1 duration-200`).
+(`animate-in fade-in slide-in-from-top-1 duration-200`) and `role="alert"`
++ `aria-live="polite"` for screen readers. The `actions.ts` server
+function is unchanged — the existing error strings are fine.
 
 ### E3. OAuth callback errors (existing, polished)
 
@@ -181,21 +182,36 @@ the form's error state would be confusing.
 ## i18n
 
 The login page currently has no i18n — all copy is hardcoded. This
-change introduces the `login` namespace and wraps new strings in
-`useTranslations('login')`. Existing hardcoded strings also move to i18n
-as part of this change. New keys (in `en.json`):
+change introduces the `login` namespace and wraps all visible strings
+in `useTranslations('login')`. New keys (in `en.json`):
 
 - `tagline`
-- `or_use_pat`
-- `pat_summary`
-- `gitea_url_health_ok`
-- `gitea_url_health_unreachable`
-- `gitea_url_health_checking`
-- `setup_help_summary`
-- `setup_help_step_1` … `setup_help_step_4`
-- `new_here_get_token`
-- `last_used_hint`
-- `url_invalid`
+- `headline` — replaces "Sign in to forge-git"
+- `subhead` — replaces "Connect to your Gitea instance"
+- `oauthButton` — replaces "Sign in with Gitea"
+- `oauthHint` — replaces "One-click sign in. Requires OAuth2 configured..."
+- `orUsePat` — replaces "Or use a personal access token"
+- `patSummary` — replaces "Manual token"
+- `giteaUrlPlaceholder`
+- `tokenPlaceholder`
+- `tokenHint`
+- `submitPat` — replaces "Sign in with PAT"
+- `submitting` — replaces "Signing in..."
+- `newHereGetToken`
+- `lastUsedHint`
+- `urlInvalid`
+- `urlHealthIdle`
+- `urlHealthChecking`
+- `urlHealthOk`
+- `urlHealthUnreachable`
+- `setupHelpSummary`
+- `setupHelpStep1` … `setupHelpStep4`
+- `setupHelpRedirect`
+- `setupHelpCli`
+- `copyCode`
+- `copyCodeCopied`
+- `oauthError.*` — covers the existing OAuth callback error map
+  (`no-gitea-url`, `oauth-not-configured`, etc.) under a nested object
 
 Add the same keys to `es.json` and `zh.json`. The existing
 `onError: MISSING_MESSAGE → return error.key` handler means a missing
