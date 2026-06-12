@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1781182947115,
+      "tag": "0000_eager_captain_flint",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781182947116,
+      "tag": "0001_add_gitea_ids",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781182947117,
+      "tag": "0002_drop_error_tables",
+      "breakpoints": true
+    }
+  ]
+}
