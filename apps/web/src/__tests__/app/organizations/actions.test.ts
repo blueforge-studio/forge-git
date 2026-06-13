@@ -76,6 +76,7 @@ describe('createOrgAction', () => {
   })
 
   it('still redirects if DB upsert fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     mockCreateOrg.mockResolvedValue({ id: 42, name: 'acme', full_name: null, description: null })
     mockUpsertOrgByGiteaId.mockRejectedValue(new Error('DB down'))
 
@@ -83,6 +84,13 @@ describe('createOrgAction', () => {
     fd.set('name', 'acme')
 
     await expect(createOrgAction({ error: '', field: '' }, fd)).resolves.not.toThrow()
+
+    expect(mockUpsertOrgByGiteaId).toHaveBeenCalled()
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[forge-db] upsertOrgByGiteaId failed'),
+      expect.any(Error),
+    )
+    errorSpy.mockRestore()
   })
 
   it('returns error if gitea createOrg fails (no DB write)', async () => {

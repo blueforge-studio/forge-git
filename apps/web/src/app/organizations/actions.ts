@@ -9,7 +9,7 @@ import {
   updateOrg,
   getUser,
 } from '@forge-git/gitea-bridge'
-import type { CreateOrgRequest, GiteaOpts } from '@forge-git/gitea-bridge'
+import type { CreateOrgRequest, GiteaOpts, GiteaOrg } from '@forge-git/gitea-bridge'
 import { upsertOrgByGiteaId, deleteOrgByName, getOrgByName } from '@forge-git/db/orgs'
 import { addMember, removeMember } from '@forge-git/db/members'
 import { findOrCreateUserByGiteaId } from '@forge-git/db/users'
@@ -38,17 +38,11 @@ export async function createOrgAction(
     return { error: 'Name can only contain letters, numbers, dots, hyphens, and underscores', field: 'name' }
   }
 
-  let created: { id: number; name: string; full_name?: string; description?: string }
+  let created: GiteaOrg
   try {
     const data: CreateOrgRequest = { name, full_name, description }
     if (visibility) data.visibility = visibility as 'public' | 'limited' | 'private'
-    const result = await createOrg(data, session)
-    created = {
-      id: result.id,
-      name: result.name,
-      full_name: result.full_name,
-      description: result.description,
-    }
+    created = await createOrg(data, giteaOpts(session))
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     if (msg.includes('409')) {
