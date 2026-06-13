@@ -1,5 +1,5 @@
 import type { StorageAdapter, ErrorGroup, ErrorEvent, ErrorStatus } from '@blueforge-studio/error-tracker'
-import { getPool } from './db'
+import { getPool } from '@forge-git/db'
 
 export class PgStorageAdapter implements StorageAdapter {
   async getErrorGroup(fingerprint: string): Promise<ErrorGroup | null> {

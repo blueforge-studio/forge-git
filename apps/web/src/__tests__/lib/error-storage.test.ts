@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const mockQuery = vi.fn()
-vi.mock('pg', () => ({
-  Pool: vi.fn().mockImplementation(() => ({
+vi.mock('@forge-git/db', () => ({
+  getPool: vi.fn().mockImplementation(() => ({
     query: mockQuery,
   })),
 }))
 
-// Must import after mock so the Pool constructor is mocked
+// Must import after mock so the pool is mocked
 async function importFresh() {
   vi.resetModules()
   mockQuery.mockReset()
