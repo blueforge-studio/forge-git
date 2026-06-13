@@ -72,11 +72,7 @@ session (HMAC-signed OAuth + PAT), queue (BullMQ), minio (S3 presigned URLs), oa
 
 1. **Actual CI/CD pipeline functionality is minimal**: The deploy-runner only handles a single `test` job with two steps (checkout + run). No matrix builds, no multi-job workflows, no action marketplace, no caching. The `.forge-git.yml` workflow syntax described in README is aspirational — only the basic `jobs.test.steps` array is actually parsed and executed.
 
-2. **No database for forge-git metadata**: PostgreSQL is in docker-compose but unused. Types exist for `ForgeGitOrg`, `ForgeGitMember`, `ForgeGitWorkflow`, `ForgeGitPreview` but have no backing tables, API endpoints, or UI. This means:
-   - Organizations created in forge-git don't persist beyond the Gitea org
-   - No team management beyond Gitea's native teams
-   - No workflow/pipeline customization stored in forge-git
-   - No preview environments
+2. ~~No database for forge-git metadata~~ — DONE 2026-06-12. `@forge-git/db` package extracts Drizzle schema + queries from `apps/web`. Orgs + members are write-through mirrored to Postgres. Workflows + previews deferred to sub-project 2.
 
 3. **No caching layer**: Every page load hits the Gitea API directly. Redis is only used for BullMQ and log streaming. High-traffic endpoints (repo list, issue list) have no cache.
 
