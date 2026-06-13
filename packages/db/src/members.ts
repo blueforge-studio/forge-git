@@ -1,7 +1,6 @@
 import { and, asc, eq } from 'drizzle-orm'
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { forgeMembers, forgeOrgs, forgeUsers } from './schema'
-import { runMigrations } from './client'
+import { runMigrations, type DB } from './client'
 
 export type Member = {
   orgId: string
@@ -12,7 +11,7 @@ export type Member = {
 }
 
 export async function listMembers(
-  db: NodePgDatabase,
+  db: DB,
   orgName: string,
 ): Promise<Member[]> {
   await runMigrations()
@@ -31,7 +30,7 @@ export async function listMembers(
 }
 
 export async function addMember(
-  db: NodePgDatabase,
+  db: DB,
   params: {
     orgName: string
     userId: string
@@ -56,7 +55,7 @@ export async function addMember(
 }
 
 export async function removeMember(
-  db: NodePgDatabase,
+  db: DB,
   params: { orgName: string; userId: string },
 ): Promise<void> {
   await runMigrations()

@@ -1,10 +1,25 @@
 'use server'
 
 import { getSession } from '@/lib/session'
-import { createOrg, addOrgMember, removeOrgMember, createTeam, updateOrg } from '@forge-git/gitea-bridge'
+import {
+  createOrg,
+  addOrgMember,
+  removeOrgMember,
+  createTeam,
+  updateOrg,
+  getUser,
+} from '@forge-git/gitea-bridge'
 import type { CreateOrgRequest, GiteaOpts } from '@forge-git/gitea-bridge'
+import { upsertOrgByGiteaId, deleteOrgByName, getOrgByName } from '@forge-git/db/orgs'
+import { addMember, removeMember } from '@forge-git/db/members'
+import { findOrCreateUserByGiteaId } from '@forge-git/db/users'
+import { getDb } from '@forge-git/db/client'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+
+function giteaOpts(session: { baseUrl: string; token: string }): GiteaOpts {
+  return { baseUrl: session.baseUrl, token: session.token }
+}
 
 export async function createOrgAction(
   prevState: { error: string; field: string },
@@ -14,8 +29,8 @@ export async function createOrgAction(
   if (!session) redirect('/login')
 
   const name = (formData.get('name') as string).trim()
-  const full_name = (formData.get('full_name') as string).trim() || undefined
-  const description = (formData.get('description') as string).trim() || undefined
+  const full_name = ((formData.get('full_name') as string) ?? '').trim() || undefined
+  const description = ((formData.get('description') as string) ?? '').trim() || undefined
   const visibility = (formData.get('visibility') as string) || undefined
 
   if (!name) return { error: 'Organization name is required', field: 'name' }
@@ -23,16 +38,35 @@ export async function createOrgAction(
     return { error: 'Name can only contain letters, numbers, dots, hyphens, and underscores', field: 'name' }
   }
 
+  let created: { id: number; name: string; full_name?: string; description?: string }
   try {
     const data: CreateOrgRequest = { name, full_name, description }
     if (visibility) data.visibility = visibility as 'public' | 'limited' | 'private'
-    await createOrg(data, session)
+    const result = await createOrg(data, session)
+    created = {
+      id: result.id,
+      name: result.name,
+      full_name: result.full_name,
+      description: result.description,
+    }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     if (msg.includes('409')) {
       return { error: 'An organization with this name already exists', field: 'name' }
     }
     return { error: `Failed to create organization: ${msg}`, field: '' }
+  }
+
+  // Write-through to DB. Gitea succeeded; failures here are logged but not user-blocking.
+  try {
+    await upsertOrgByGiteaId(getDb(), {
+      giteaId: created.id,
+      giteaOrg: created.name,
+      displayName: created.full_name ?? null,
+      description: created.description ?? null,
+    })
+  } catch (err) {
+    console.error('[forge-db] upsertOrgByGiteaId failed:', err)
   }
 
   revalidatePath('/organizations')
@@ -61,6 +95,23 @@ export async function addMemberAction(
     return { error: `Failed to add member: ${msg}`, field: '' }
   }
 
+  // Look up the Gitea user to get their numeric id, then mirror to DB.
+  try {
+    const profile = await getUser(username, giteaOpts(session)) as { id: number; email?: string }
+    const forgeUser = await findOrCreateUserByGiteaId(getDb(), {
+      giteaUserId: profile.id,
+      username,
+      email: profile.email ?? `${username}@unknown.local`,
+    })
+    await addMember(getDb(), {
+      orgName: org,
+      userId: forgeUser.id,
+      role: 'member',
+    })
+  } catch (err) {
+    console.error('[forge-db] addMember mirror failed:', err)
+  }
+
   revalidatePath(`/organizations/${org}`)
   return { error: '', field: '' }
 }
@@ -80,6 +131,18 @@ export async function removeMemberAction(
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     return { error: `Failed to remove member: ${msg}`, field: '' }
+  }
+
+  try {
+    const profile = await getUser(username, giteaOpts(session)) as { id: number }
+    const forgeUser = await findOrCreateUserByGiteaId(getDb(), {
+      giteaUserId: profile.id,
+      username,
+      email: `${username}@unknown.local`,
+    })
+    await removeMember(getDb(), { orgName: org, userId: forgeUser.id })
+  } catch (err) {
+    console.error('[forge-db] removeMember mirror failed:', err)
   }
 
   revalidatePath(`/organizations/${org}`)
@@ -148,6 +211,21 @@ export async function editOrgAction(
     return { error: `Failed to update organization: ${msg}`, field: '' }
   }
 
+  // Mirror name + description changes to DB
+  try {
+    const existing = await getOrgByName(getDb(), org)
+    if (existing) {
+      await upsertOrgByGiteaId(getDb(), {
+        giteaId: existing.giteaId,
+        giteaOrg: org,
+        displayName: full_name ?? existing.displayName,
+        description: description ?? existing.description,
+      })
+    }
+  } catch (err) {
+    console.error('[forge-db] editOrg mirror failed:', err)
+  }
+
   revalidatePath(`/organizations/${org}`)
   redirect(`/organizations/${org}`)
 }
@@ -181,6 +259,12 @@ export async function deleteOrgAction(
       return { error: 'Organization not found', field: '' }
     }
     return { error: `Failed to delete organization: ${msg}`, field: '' }
+  }
+
+  try {
+    await deleteOrgByName(getDb(), orgName)
+  } catch (err) {
+    console.error('[forge-db] deleteOrgByName failed:', err)
   }
 
   revalidatePath('/organizations')

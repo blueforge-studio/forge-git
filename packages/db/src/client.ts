@@ -32,3 +32,8 @@ export async function runMigrations(): Promise<void> {
   await migrate(getDb(), { migrationsFolder: './drizzle' })
   migrated = true
 }
+
+// Permissive DB type accepted by query helpers. getDb() returns a more specific
+// `NodePgDatabase<{ forgeUsers, forgeOrgs, ... }>`, but it is structurally
+// assignable to `NodePgDatabase<Record<string, unknown>>`.
+export type DB = import('drizzle-orm/node-postgres').NodePgDatabase<Record<string, unknown>>

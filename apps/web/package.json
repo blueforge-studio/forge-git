@@ -27,6 +27,7 @@
     "@blueforge-studio/marketing-kit": "^0.5.4",
     "@blueforge-studio/queue-adapter": "^0.1.2",
     "@blueforge-studio/service-factory": "^0.4.3",
+    "@forge-git/db": "workspace:*",
     "@forge-git/deploy-runner": "workspace:*",
     "@forge-git/gitea-bridge": "workspace:*",
     "@forge-git/ui": "workspace:*",

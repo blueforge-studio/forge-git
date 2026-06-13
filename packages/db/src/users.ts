@@ -1,10 +1,9 @@
 import { eq } from 'drizzle-orm'
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { forgeUsers } from './schema'
-import { runMigrations } from './client'
+import { runMigrations, type DB } from './client'
 
 export async function findOrCreateUserByGiteaLogin(
-  db: NodePgDatabase,
+  db: DB,
   params: { username: string; email: string; token: string },
 ): Promise<{ id: string }> {
   await runMigrations()
@@ -21,7 +20,7 @@ export async function findOrCreateUserByGiteaLogin(
 }
 
 export async function findOrCreateUserByGiteaId(
-  db: NodePgDatabase,
+  db: DB,
   params: { giteaUserId: number; username: string; email: string },
 ): Promise<{ id: string }> {
   await runMigrations()
@@ -40,7 +39,7 @@ export async function findOrCreateUserByGiteaId(
 }
 
 export async function getUserGiteaToken(
-  db: NodePgDatabase,
+  db: DB,
   userId: string,
 ): Promise<string | null> {
   const rows = await db.select({ giteaToken: forgeUsers.giteaToken })

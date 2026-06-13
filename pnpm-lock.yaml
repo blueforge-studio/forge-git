@@ -50,6 +50,9 @@ importers:
       '@blueforge-studio/service-factory':
         specifier: ^0.4.3
         version: 0.4.3(@supabase/supabase-js@2.108.0)(ioredis@5.10.1)(pg@8.21.0)
+      '@forge-git/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@forge-git/deploy-runner':
         specifier: workspace:*
         version: link:../../packages/deploy-runner

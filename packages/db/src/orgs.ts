@@ -1,16 +1,15 @@
 import { asc, eq } from 'drizzle-orm'
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { forgeOrgs } from './schema'
-import { runMigrations } from './client'
+import { runMigrations, type DB } from './client'
 
 export type Org = typeof forgeOrgs.$inferSelect
 
-export async function listOrgs(db: NodePgDatabase): Promise<Org[]> {
+export async function listOrgs(db: DB): Promise<Org[]> {
   await runMigrations()
   return db.select().from(forgeOrgs).orderBy(asc(forgeOrgs.createdAt))
 }
 
-export async function getOrgByName(db: NodePgDatabase, giteaOrg: string): Promise<Org | null> {
+export async function getOrgByName(db: DB, giteaOrg: string): Promise<Org | null> {
   await runMigrations()
   const rows = await db.select().from(forgeOrgs)
     .where(eq(forgeOrgs.giteaOrg, giteaOrg))
@@ -18,7 +17,7 @@ export async function getOrgByName(db: NodePgDatabase, giteaOrg: string): Promis
   return rows[0] ?? null
 }
 
-export async function getOrgByGiteaId(db: NodePgDatabase, giteaId: number): Promise<Org | null> {
+export async function getOrgByGiteaId(db: DB, giteaId: number): Promise<Org | null> {
   await runMigrations()
   const rows = await db.select().from(forgeOrgs)
     .where(eq(forgeOrgs.giteaId, giteaId))
@@ -27,7 +26,7 @@ export async function getOrgByGiteaId(db: NodePgDatabase, giteaId: number): Prom
 }
 
 export async function upsertOrgByGiteaId(
-  db: NodePgDatabase,
+  db: DB,
   params: {
     giteaId: number
     giteaOrg: string
@@ -53,7 +52,7 @@ export async function upsertOrgByGiteaId(
   return rows[0]
 }
 
-export async function deleteOrgByName(db: NodePgDatabase, giteaOrg: string): Promise<void> {
+export async function deleteOrgByName(db: DB, giteaOrg: string): Promise<void> {
   await runMigrations()
   await db.delete(forgeOrgs).where(eq(forgeOrgs.giteaOrg, giteaOrg))
 }
